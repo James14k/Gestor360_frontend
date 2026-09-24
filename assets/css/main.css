@@ -1,0 +1,113 @@
+@import url("variables.css");
+@import url("components.css");
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--app-font-sans);
+  background: var(--app-bg);
+  min-height: 100vh;
+  color: var(--bs-body-color);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--app-focus-ring);
+}
+
+.app-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "topbar"
+    "main"
+    "footer";
+}
+
+.app-topbar {
+  grid-area: topbar;
+  min-height: var(--app-topbar-height);
+}
+
+.app-main {
+  grid-area: main;
+}
+
+.app-footer {
+  grid-area: footer;
+  background: var(--app-surface) !important;
+}
+
+@media (min-width: 992px) {
+  .app-layout {
+    grid-template-columns: var(--app-sidebar-width) 1fr;
+    grid-template-areas:
+      "sidebar topbar"
+      "sidebar main"
+      "sidebar footer";
+  }
+
+  .app-sidebar {
+    grid-area: sidebar;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .app-sidebar-offcanvas {
+    display: none !important;
+  }
+}
+
+.card {
+  border-color: var(--app-border);
+  box-shadow: var(--app-shadow-sm);
+  border-radius: var(--app-radius);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--app-primary);
+  --bs-btn-border-color: var(--app-primary);
+  --bs-btn-hover-bg: var(--app-primary-dark);
+  --bs-btn-hover-border-color: var(--app-primary-dark);
+  --bs-btn-active-bg: var(--app-primary-dark);
+  --bs-btn-active-border-color: var(--app-primary-dark);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--app-primary);
+  --bs-btn-border-color: var(--app-primary);
+  --bs-btn-hover-bg: var(--app-primary);
+  --bs-btn-hover-border-color: var(--app-primary);
+}
+
+.spinner-border.text-primary {
+  color: var(--app-primary) !important;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  z-index: 2000;
+  padding: 0.75rem 1rem;
+  background: var(--app-primary-dark);
+  color: #fff;
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+}
+
+.public-nav {
+  background: var(--app-surface);
+}
+
+.public-footer {
+  background: var(--app-bg-alt);
+}
