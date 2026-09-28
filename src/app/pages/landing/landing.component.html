@@ -18,19 +18,13 @@
     </button>
     <div class="collapse navbar-collapse" [class.show]="navOpen()" id="publicNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-        <li class="nav-item"><a class="nav-link" href="#solucion">Solución</a></li>
+        <li class="nav-item"><a class="nav-link" href="#token">Token</a></li>
         @if (auth.isAuthenticated()) {
           <li class="nav-item"><a class="nav-link" routerLink="/dashboard">Panel</a></li>
           <li class="nav-item">
             <a class="btn btn-primary ms-lg-2" routerLink="/productos">
               <i class="bi bi-boxes me-1" aria-hidden="true"></i> Inventario
             </a>
-          </li>
-        } @else {
-          <li class="nav-item">
-            <button type="button" class="btn btn-primary ms-lg-2" (click)="login()">
-              <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
-            </button>
           </li>
         }
       </ul>
@@ -43,13 +37,12 @@
     <div class="container py-lg-4">
       <div class="row align-items-center g-5">
         <div class="col-lg-6">
-          <p class="text-uppercase small fw-semibold eyebrow mb-2">Pedidos360 · Operaciones Suspel</p>
-          <h1 class="display-5 fw-bold mb-3">Control de inventario con enfoque en seguridad y trazabilidad</h1>
-          <p class="lead text-secondary mb-4">
-            Plataforma de gestión para equipos que administran sustancias peligrosas: stock por bodega,
-            clasificación IMO y seguimiento operativo desde un mismo panel.
+          <p class="text-uppercase small fw-semibold eyebrow mb-2 reveal reveal-1">Pedidos360 · Operaciones Suspel</p>
+          <h1 class="display-5 fw-bold mb-3 reveal reveal-2">Inventario seguro y bajo control</h1>
+          <p class="lead text-secondary mb-4 reveal reveal-3">
+            Stock por bodega y clasificación IMO en un solo lugar.
           </p>
-          <div class="d-flex flex-wrap gap-2">
+          <div class="d-flex flex-wrap gap-2 reveal reveal-4">
             @if (auth.isAuthenticated()) {
               <a routerLink="/productos" class="btn btn-primary btn-lg">
                 <i class="bi bi-box-seam me-1" aria-hidden="true"></i> Acceder al inventario
@@ -63,7 +56,17 @@
           </div>
         </div>
         <div class="col-lg-6">
-          <div class="card hero-panel shadow-sm">
+          <div class="hero-media reveal reveal-2">
+            <img
+              class="hero-image"
+              src="img/bodega-hero.jpg"
+              alt="Camiones estacionados frente a los andenes de carga de una bodega industrial"
+              width="815"
+              height="380"
+              fetchpriority="high"
+            >
+          </div>
+          <div class="card hero-panel hero-panel-below reveal reveal-4">
             <div class="card-body p-4">
               <h2 class="h5 mb-3">Su operación, en un solo lugar</h2>
               <ul class="list-unstyled mb-0">
@@ -91,43 +94,43 @@
     </div>
   </section>
 
-  <section id="solucion" class="py-5 bg-body">
+  <section id="token" class="py-5 bg-body">
     <div class="container">
-      <div class="text-center mb-5">
-        <h2 class="h3 fw-semibold">Pensado para equipos de logística y cumplimiento</h2>
-        <p class="text-secondary mb-0 col-lg-8 mx-auto">
-          Pedidos360 concentra la información que su empresa necesita para operar con orden,
-          sin distracciones técnicas en pantalla.
-        </p>
+      <div class="text-center mb-4">
+        <h2 class="h3 fw-semibold">Token</h2>
+        <p class="text-secondary mb-0">Access Token de la sesión actual.</p>
       </div>
-      <div class="row g-4">
-        <article class="col-md-4">
-          <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-              <div class="feature-icon mb-3" aria-hidden="true"><i class="bi bi-clipboard-data"></i></div>
-              <h3 class="h5">Inventario centralizado</h3>
-              <p class="text-secondary mb-0">Consulte cantidades, bodegas y fichas de producto desde un listado claro y filtrable.</p>
-            </div>
+      <div class="col-lg-10 mx-auto">
+        <div class="card token-card">
+          <div class="card-body p-4">
+            @if (auth.isAuthenticated()) {
+              @if (token(); as t) {
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                  <span class="small text-secondary text-uppercase fw-semibold">
+                    <i class="bi bi-key me-1" aria-hidden="true"></i> Bearer token · {{ auth.username() }}
+                  </span>
+                  <button type="button" class="btn btn-sm btn-outline-primary" (click)="copyToken()">
+                    <i class="bi me-1" [class.bi-clipboard]="!copied()" [class.bi-clipboard-check]="copied()" aria-hidden="true"></i>
+                    {{ copied() ? 'Copiado' : 'Copiar' }}
+                  </button>
+                </div>
+                <pre class="token-value mb-0" tabindex="0">{{ t }}</pre>
+              } @else {
+                <div class="text-center py-4 text-secondary" role="status">
+                  <div class="spinner-border spinner-border-sm me-2" aria-hidden="true"></div> Obteniendo token…
+                </div>
+              }
+            } @else {
+              <div class="text-center py-4">
+                <i class="bi bi-lock fs-2 text-secondary" aria-hidden="true"></i>
+                <p class="text-secondary mt-2 mb-3">Inicia sesión para ver tu token.</p>
+                <button type="button" class="btn btn-primary" (click)="login()">
+                  <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
+                </button>
+              </div>
+            }
           </div>
-        </article>
-        <article class="col-md-4">
-          <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-              <div class="feature-icon mb-3" aria-hidden="true"><i class="bi bi-bar-chart-line"></i></div>
-              <h3 class="h5">Panel ejecutivo</h3>
-              <p class="text-secondary mb-0">Resumen de unidades, bodegas activas y productos con stock bajo para decisiones rápidas.</p>
-            </div>
-          </div>
-        </article>
-        <article class="col-md-4">
-          <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-              <div class="feature-icon mb-3" aria-hidden="true"><i class="bi bi-phone"></i></div>
-              <h3 class="h5">Uso en terreno y oficina</h3>
-              <p class="text-secondary mb-0">Interfaz adaptable a computador, tablet y móvil para consultas en planta o en despacho.</p>
-            </div>
-          </div>
-        </article>
+        </div>
       </div>
     </div>
   </section>

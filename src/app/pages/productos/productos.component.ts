@@ -58,6 +58,12 @@ export class ProductosComponent {
   protected readonly filterBodega = signal('');
   protected readonly filterImoClass = signal('');
 
+  protected readonly searchMode = signal<'list' | 'id'>('list');
+  protected readonly idQuery = signal('');
+  protected readonly idSearching = signal(false);
+  protected readonly idResult = signal<ProductoSuspel | null>(null);
+  protected readonly idError = signal<string | null>(null);
+
   protected readonly page = signal(1);
   protected readonly pageSize = signal<number>(ENV.pagination.defaultPageSize);
   protected readonly sortKey = signal<SortKey>('nombre');
@@ -157,6 +163,54 @@ export class ProductosComponent {
     }
   }
 
+  protected buscarPorId(): void {
+    const raw = this.idQuery().toString().trim();
+    const id = Number(raw);
+    this.idResult.set(null);
+
+    if (!raw || !Number.isInteger(id) || id < 1) {
+      this.idError.set('Ingresa un ID numérico válido (entero mayor a 0).');
+      return;
+    }
+
+    this.idError.set(null);
+    this.idSearching.set(true);
+    this.productoService.obtener(id).subscribe({
+      next: (producto) => {
+        this.idResult.set(producto);
+        this.idSearching.set(false);
+      },
+      error: (error) => {
+        this.idError.set(
+          error?.status === 404
+            ? `No existe un producto con ID ${id}.`
+            : error?.error?.message || 'No fue posible buscar el producto.'
+        );
+        this.idSearching.set(false);
+      },
+    });
+  }
+
+  protected setSearchMode(mode: 'list' | 'id'): void {
+    if (mode === 'list') this.clearIdSearch();
+    this.searchMode.set(mode);
+  }
+
+  protected clearIdSearch(): void {
+    this.idQuery.set('');
+    this.idResult.set(null);
+    this.idError.set(null);
+  }
+
+  private refreshIdResult(): void {
+    const current = this.idResult();
+    if (current?.id == null) return;
+    this.productoService.obtener(current.id).subscribe({
+      next: (producto) => this.idResult.set(producto),
+      error: () => this.idResult.set(null),
+    });
+  }
+
   protected refreshProductos(): void {
     this.loading.set(true);
     this.loadError.set(null);
@@ -230,6 +284,7 @@ export class ProductosComponent {
         this.saving.set(false);
         this.showFormModal.set(false);
         this.refreshProductos();
+        this.refreshIdResult();
       },
       error: (error) => {
         const message = error?.error?.message || 'No fue posible guardar el producto.';
@@ -260,6 +315,7 @@ export class ProductosComponent {
         this.deleting.set(false);
         this.showConfirmModal.set(false);
         this.confirmTarget.set(null);
+        if (this.idResult()?.id === producto.id) this.idResult.set(null);
         this.refreshProductos();
       },
       error: (error) => {

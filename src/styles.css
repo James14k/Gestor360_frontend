@@ -278,6 +278,55 @@ body {
   border-left: 4px solid var(--app-accent);
 }
 
+.hero-media {
+  overflow: hidden;
+  border-radius: 0.75rem;
+  box-shadow: 0 18px 40px -12px rgba(20, 35, 46, 0.35), 0 4px 10px rgba(20, 35, 46, 0.08);
+}
+
+.hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.6s ease;
+}
+
+.hero-media:hover .hero-image {
+  transform: scale(1.05);
+}
+
+.hero-panel-below {
+  margin-top: 1.5rem;
+  box-shadow: 0 12px 30px -10px rgba(20, 35, 46, 0.25), 0 2px 6px rgba(20, 35, 46, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hero-panel-below:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(20, 35, 46, 0.3), 0 4px 10px rgba(20, 35, 46, 0.08);
+}
+
+.hero-panel li i {
+  transition: transform 0.25s ease;
+}
+
+.hero-panel li:hover i {
+  transform: scale(1.2) rotate(-6deg);
+}
+
+.id-search-input {
+  width: 100%;
+  max-width: 320px;
+}
+
+.detail-tile {
+  height: 100%;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-bg);
+}
+
 .feature-icon {
   width: 2.75rem;
   height: 2.75rem;
@@ -287,6 +336,123 @@ body {
   border-radius: 0.55rem;
   background: rgba(15, 76, 92, 0.09);
   color: var(--app-primary);
+  transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.feature-card {
+  box-shadow: 0 2px 4px rgba(20, 35, 46, 0.05), 0 10px 24px -8px rgba(20, 35, 46, 0.12);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 4px 8px rgba(20, 35, 46, 0.06), 0 22px 40px -12px rgba(20, 35, 46, 0.25);
+}
+
+.feature-card:hover .feature-icon {
+  background: var(--app-primary);
+  color: #fff;
+  transform: scale(1.08) rotate(-5deg);
+}
+
+/* ===== animaciones ===== */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.reveal-1 { animation-delay: 0.05s; }
+.reveal-2 { animation-delay: 0.15s; }
+.reveal-3 { animation-delay: 0.25s; }
+.reveal-4 { animation-delay: 0.35s; }
+
+.hero-panel li {
+  animation: fade-up 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.hero-panel li:nth-child(1) { animation-delay: 0.55s; }
+.hero-panel li:nth-child(2) { animation-delay: 0.65s; }
+.hero-panel li:nth-child(3) { animation-delay: 0.75s; }
+.hero-panel li:nth-child(4) { animation-delay: 0.85s; }
+
+/* Las tarjetas de "Solución" aparecen al hacer scroll (solo navegadores con soporte). */
+@supports (animation-timeline: view()) {
+  .reveal-scroll {
+    animation: fade-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+  }
+}
+
+.landing-hero .btn,
+.public-nav .btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.landing-hero .btn-primary {
+  box-shadow: 0 6px 16px -4px rgba(15, 76, 92, 0.5);
+}
+
+.landing-hero .btn:hover,
+.public-nav .btn:hover {
+  transform: translateY(-2px);
+}
+
+.landing-hero .btn-primary:hover {
+  box-shadow: 0 12px 22px -6px rgba(15, 76, 92, 0.55);
+}
+
+.landing-hero .btn:active,
+.public-nav .btn:active {
+  transform: translateY(0);
+}
+
+.public-nav {
+  box-shadow: 0 4px 18px -6px rgba(20, 35, 46, 0.18);
+}
+
+.public-nav .navbar-brand .app-brand-mark {
+  transition: transform 0.3s ease;
+}
+
+.public-nav .navbar-brand:hover .app-brand-mark {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-scroll,
+  .hero-panel li {
+    animation: none;
+  }
+
+  .hero-image,
+  .hero-panel-below,
+  .feature-card,
+  .feature-icon,
+  .landing-hero .btn,
+  .public-nav .btn {
+    transition: none;
+  }
+
+  .hero-media:hover .hero-image,
+  .hero-panel-below:hover,
+  .feature-card:hover,
+  .feature-card:hover .feature-icon,
+  .landing-hero .btn:hover,
+  .public-nav .btn:hover {
+    transform: none;
+  }
 }
 
 .text-accent {
@@ -349,4 +515,21 @@ body {
   .app-table tbody td:last-child::before {
     display: none;
   }
+}
+
+.token-card {
+  box-shadow: 0 2px 4px rgba(20, 35, 46, 0.05), 0 10px 24px -8px rgba(20, 35, 46, 0.12);
+}
+
+.token-value {
+  padding: 1rem;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-bg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 14rem;
+  overflow-y: auto;
 }

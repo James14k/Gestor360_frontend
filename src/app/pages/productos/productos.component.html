@@ -8,209 +8,308 @@
   </button>
 </div>
 
-<section class="card shadow-sm mb-3" aria-labelledby="filters-title">
-  <div class="card-body">
-    <h2 id="filters-title" class="h6 text-secondary text-uppercase fw-semibold mb-3">Filtros y búsqueda</h2>
-    <form class="row g-3 align-items-end" (submit)="$event.preventDefault()">
-      <div class="col-md-4">
-        <label for="filter-q" class="form-label">Buscar</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
-          <input
-            type="search"
-            class="form-control"
-            id="filter-q"
-            autocomplete="off"
-            placeholder="Nombre, IMO o bodega"
-            [ngModel]="filterQ()"
-            (ngModelChange)="filterQ.set($event); onFiltersChanged()"
-            name="q"
+<div class="btn-group mb-3" role="group" aria-label="Modo de consulta">
+  <button type="button" class="btn" [class.btn-primary]="searchMode() === 'list'" [class.btn-outline-primary]="searchMode() !== 'list'" [attr.aria-pressed]="searchMode() === 'list'" (click)="setSearchMode('list')">
+    <i class="bi bi-list-ul me-1" aria-hidden="true"></i> Listado
+  </button>
+  <button type="button" class="btn" [class.btn-primary]="searchMode() === 'id'" [class.btn-outline-primary]="searchMode() !== 'id'" [attr.aria-pressed]="searchMode() === 'id'" (click)="setSearchMode('id')">
+    <i class="bi bi-hash me-1" aria-hidden="true"></i> Buscar por ID
+  </button>
+</div>
+
+@if (searchMode() === 'list') {
+  <section class="card shadow-sm mb-3" aria-labelledby="filters-title">
+    <div class="card-body">
+      <h2 id="filters-title" class="h6 text-secondary text-uppercase fw-semibold mb-3">Filtros y búsqueda</h2>
+      <form class="row g-3 align-items-end" (submit)="$event.preventDefault()">
+        <div class="col-md-4">
+          <label for="filter-q" class="form-label">Buscar</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
+            <input
+              type="search"
+              class="form-control"
+              id="filter-q"
+              autocomplete="off"
+              placeholder="Nombre, IMO o bodega"
+              [ngModel]="filterQ()"
+              (ngModelChange)="filterQ.set($event); onFiltersChanged()"
+              name="q"
+            >
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label for="filter-bodega" class="form-label">Bodega</label>
+          <select
+            class="form-select"
+            id="filter-bodega"
+            name="bodega"
+            [ngModel]="filterBodega()"
+            (ngModelChange)="filterBodega.set($event); onFiltersChanged()"
           >
-        </div>
-      </div>
-      <div class="col-md-3">
-        <label for="filter-bodega" class="form-label">Bodega</label>
-        <select
-          class="form-select"
-          id="filter-bodega"
-          name="bodega"
-          [ngModel]="filterBodega()"
-          (ngModelChange)="filterBodega.set($event); onFiltersChanged()"
-        >
-          <option value="">Todas</option>
-          @for (b of bodegaOptions(); track b) {
-            <option [value]="b">{{ b }}</option>
-          }
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label for="filter-imo" class="form-label">Clase IMO</label>
-        <select
-          class="form-select"
-          id="filter-imo"
-          name="imoClass"
-          [ngModel]="filterImoClass()"
-          (ngModelChange)="filterImoClass.set($event); onFiltersChanged()"
-        >
-          <option value="">Todas</option>
-          @for (c of imoClassOptions(); track c) {
-            <option [value]="c">{{ c }}</option>
-          }
-        </select>
-      </div>
-      <div class="col-md-2 d-grid">
-        <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Limpiar</button>
-      </div>
-    </form>
-  </div>
-</section>
-
-<section class="card shadow-sm" aria-labelledby="products-table-title">
-  <div class="card-header bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-2 py-3">
-    <div>
-      <h2 id="products-table-title" class="h5 mb-0">Listado de productos</h2>
-      <p class="small text-secondary mb-0" aria-live="polite">
-        @if (!loading() && !loadError()) {
-          Mostrando {{ paginated().items.length }} de {{ paginated().total }} resultado{{ paginated().total === 1 ? '' : 's' }}.
-        }
-      </p>
-    </div>
-    <div class="d-flex align-items-center gap-2">
-      <label for="page-size" class="small text-secondary mb-0">Filas</label>
-      <select
-        class="form-select form-select-sm w-auto"
-        id="page-size"
-        [ngModel]="pageSize()"
-        (ngModelChange)="onPageSizeChange($event)"
-      >
-        @for (n of pageSizeOptions; track n) {
-          <option [value]="n">{{ n }}</option>
-        }
-      </select>
-    </div>
-  </div>
-
-  <div class="card-body p-0">
-    @if (loading()) {
-      <div class="text-center py-5" role="status">
-        <div class="spinner-border text-primary" aria-hidden="true"></div>
-        <p class="mt-3 text-secondary mb-0">Cargando productos…</p>
-      </div>
-    } @else if (loadError()) {
-      <div class="p-4">
-        <div class="alert alert-danger mb-0" role="alert">
-          <h3 class="h6 alert-heading">Error al cargar productos</h3>
-          <p class="mb-0">{{ loadError() }}</p>
-        </div>
-      </div>
-    } @else if (!paginated().items.length) {
-      <div class="empty-state py-5 px-3 text-center">
-        <i class="bi bi-inbox fs-1 text-secondary" aria-hidden="true"></i>
-        <h3 class="h5 mt-3">Sin resultados</h3>
-        <p class="text-secondary mb-3">
-          {{ productos().length ? 'Prueba ajustando los filtros de búsqueda.' : 'Crea el primer producto Suspel con el botón «Nuevo producto».' }}
-        </p>
-        @if (!productos().length) {
-          <button type="button" class="btn btn-primary" (click)="openCreateForm()">Crear producto</button>
-        }
-      </div>
-    } @else {
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 app-table">
-          <thead>
-            <tr>
-              <th scope="col">
-                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'id'" (click)="toggleSort('id')">
-                  ID <i class="bi" [class]="'bi-' + sortIcon('id')" aria-hidden="true"></i>
-                </button>
-              </th>
-              <th scope="col">
-                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'nombre'" (click)="toggleSort('nombre')">
-                  Nombre <i class="bi" [class]="'bi-' + sortIcon('nombre')" aria-hidden="true"></i>
-                </button>
-              </th>
-              <th scope="col">
-                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'imo'" (click)="toggleSort('imo')">
-                  Clasificación IMO <i class="bi" [class]="'bi-' + sortIcon('imo')" aria-hidden="true"></i>
-                </button>
-              </th>
-              <th scope="col">
-                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'bodega'" (click)="toggleSort('bodega')">
-                  Bodega <i class="bi" [class]="'bi-' + sortIcon('bodega')" aria-hidden="true"></i>
-                </button>
-              </th>
-              <th scope="col" class="text-end">
-                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'cantidad'" (click)="toggleSort('cantidad')">
-                  Cantidad <i class="bi" [class]="'bi-' + sortIcon('cantidad')" aria-hidden="true"></i>
-                </button>
-              </th>
-              <th scope="col" class="text-end">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (p of paginated().items; track p.id) {
-              <tr>
-                <td data-label="ID">{{ p.id }}</td>
-                <td data-label="Nombre">{{ p.nombre }}</td>
-                <td data-label="IMO">
-                  <span class="badge badge-imo">{{ p.imo }}</span>
-                </td>
-                <td data-label="Bodega">{{ p.bodega }}</td>
-                <td data-label="Cantidad" class="text-md-end" [class.text-warning-emphasis]="p.cantidad < 300" [class.fw-semibold]="p.cantidad < 300">
-                  {{ formatQuantity(p.cantidad) }}
-                </td>
-                <td class="text-end">
-                  <div class="btn-group btn-group-sm" role="group" [attr.aria-label]="'Acciones para ' + p.nombre">
-                    <button type="button" class="btn btn-outline-secondary" [attr.aria-label]="'Editar ' + p.nombre" (click)="openEditForm(p)">
-                      <i class="bi bi-pencil" aria-hidden="true"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-danger" [attr.aria-label]="'Eliminar ' + p.nombre" (click)="askDelete(p)">
-                      <i class="bi bi-trash" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+            <option value="">Todas</option>
+            @for (b of bodegaOptions(); track b) {
+              <option [value]="b">{{ b }}</option>
             }
-          </tbody>
-        </table>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="filter-imo" class="form-label">Clase IMO</label>
+          <select
+            class="form-select"
+            id="filter-imo"
+            name="imoClass"
+            [ngModel]="filterImoClass()"
+            (ngModelChange)="filterImoClass.set($event); onFiltersChanged()"
+          >
+            <option value="">Todas</option>
+            @for (c of imoClassOptions(); track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Limpiar</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card shadow-sm" aria-labelledby="products-table-title">
+    <div class="card-header bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-2 py-3">
+      <div>
+        <h2 id="products-table-title" class="h5 mb-0">Listado de productos</h2>
+        <p class="small text-secondary mb-0" aria-live="polite">
+          @if (!loading() && !loadError()) {
+            Mostrando {{ paginated().items.length }} de {{ paginated().total }} resultado{{ paginated().total === 1 ? '' : 's' }}.
+          }
+        </p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <label for="page-size" class="small text-secondary mb-0">Filas</label>
+        <select
+          class="form-select form-select-sm w-auto"
+          id="page-size"
+          [ngModel]="pageSize()"
+          (ngModelChange)="onPageSizeChange($event)"
+        >
+          @for (n of pageSizeOptions; track n) {
+            <option [value]="n">{{ n }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      @if (loading()) {
+        <div class="text-center py-5" role="status">
+          <div class="spinner-border text-primary" aria-hidden="true"></div>
+          <p class="mt-3 text-secondary mb-0">Cargando productos…</p>
+        </div>
+      } @else if (loadError()) {
+        <div class="p-4">
+          <div class="alert alert-danger mb-0" role="alert">
+            <h3 class="h6 alert-heading">Error al cargar productos</h3>
+            <p class="mb-0">{{ loadError() }}</p>
+          </div>
+        </div>
+      } @else if (!paginated().items.length) {
+        <div class="empty-state py-5 px-3 text-center">
+          <i class="bi bi-inbox fs-1 text-secondary" aria-hidden="true"></i>
+          <h3 class="h5 mt-3">Sin resultados</h3>
+          <p class="text-secondary mb-3">
+            {{ productos().length ? 'Prueba ajustando los filtros de búsqueda.' : 'Crea el primer producto Suspel con el botón «Nuevo producto».' }}
+          </p>
+          @if (!productos().length) {
+            <button type="button" class="btn btn-primary" (click)="openCreateForm()">Crear producto</button>
+          }
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0 app-table">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'id'" (click)="toggleSort('id')">
+                    ID <i class="bi" [class]="'bi-' + sortIcon('id')" aria-hidden="true"></i>
+                  </button>
+                </th>
+                <th scope="col">
+                  <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'nombre'" (click)="toggleSort('nombre')">
+                    Nombre <i class="bi" [class]="'bi-' + sortIcon('nombre')" aria-hidden="true"></i>
+                  </button>
+                </th>
+                <th scope="col">
+                  <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'imo'" (click)="toggleSort('imo')">
+                    Clasificación IMO <i class="bi" [class]="'bi-' + sortIcon('imo')" aria-hidden="true"></i>
+                  </button>
+                </th>
+                <th scope="col">
+                  <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'bodega'" (click)="toggleSort('bodega')">
+                    Bodega <i class="bi" [class]="'bi-' + sortIcon('bodega')" aria-hidden="true"></i>
+                  </button>
+                </th>
+                <th scope="col" class="text-end">
+                  <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'cantidad'" (click)="toggleSort('cantidad')">
+                    Cantidad <i class="bi" [class]="'bi-' + sortIcon('cantidad')" aria-hidden="true"></i>
+                  </button>
+                </th>
+                <th scope="col" class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of paginated().items; track p.id) {
+                <tr>
+                  <td data-label="ID">{{ p.id }}</td>
+                  <td data-label="Nombre">{{ p.nombre }}</td>
+                  <td data-label="IMO">
+                    <span class="badge badge-imo">{{ p.imo }}</span>
+                  </td>
+                  <td data-label="Bodega">{{ p.bodega }}</td>
+                  <td data-label="Cantidad" class="text-md-end" [class.text-warning-emphasis]="p.cantidad < 300" [class.fw-semibold]="p.cantidad < 300">
+                    {{ formatQuantity(p.cantidad) }}
+                  </td>
+                  <td class="text-end">
+                    <div class="btn-group btn-group-sm" role="group" [attr.aria-label]="'Acciones para ' + p.nombre">
+                      <button type="button" class="btn btn-outline-secondary" [attr.aria-label]="'Editar ' + p.nombre" (click)="openEditForm(p)">
+                        <i class="bi bi-pencil" aria-hidden="true"></i>
+                      </button>
+                      <button type="button" class="btn btn-outline-danger" [attr.aria-label]="'Eliminar ' + p.nombre" (click)="askDelete(p)">
+                        <i class="bi bi-trash" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    @if (!loading() && !loadError() && paginated().totalPages > 1) {
+      <div class="card-footer bg-transparent d-flex justify-content-center py-3">
+        <nav aria-label="Paginación de resultados">
+          <ul class="pagination pagination-sm mb-0 justify-content-center flex-wrap">
+            <li class="page-item" [class.disabled]="paginated().page <= 1">
+              <button class="page-link" type="button" [disabled]="paginated().page <= 1" aria-label="Página anterior" (click)="goToPage(paginated().page - 1)">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              </button>
+            </li>
+            @for (p of pageList(); track $index) {
+              @if (p === '…') {
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+              } @else {
+                <li class="page-item" [class.active]="p === paginated().page">
+                  <button class="page-link" type="button" (click)="goToPage(p)">{{ p }}</button>
+                </li>
+              }
+            }
+            <li class="page-item" [class.disabled]="paginated().page >= paginated().totalPages">
+              <button
+                class="page-link"
+                type="button"
+                [disabled]="paginated().page >= paginated().totalPages"
+                aria-label="Página siguiente"
+                (click)="goToPage(paginated().page + 1)"
+              >
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
     }
-  </div>
-
-  @if (!loading() && !loadError() && paginated().totalPages > 1) {
-    <div class="card-footer bg-transparent d-flex justify-content-center py-3">
-      <nav aria-label="Paginación de resultados">
-        <ul class="pagination pagination-sm mb-0 justify-content-center flex-wrap">
-          <li class="page-item" [class.disabled]="paginated().page <= 1">
-            <button class="page-link" type="button" [disabled]="paginated().page <= 1" aria-label="Página anterior" (click)="goToPage(paginated().page - 1)">
-              <i class="bi bi-chevron-left" aria-hidden="true"></i>
-            </button>
-          </li>
-          @for (p of pageList(); track $index) {
-            @if (p === '…') {
-              <li class="page-item disabled"><span class="page-link">…</span></li>
-            } @else {
-              <li class="page-item" [class.active]="p === paginated().page">
-                <button class="page-link" type="button" (click)="goToPage(p)">{{ p }}</button>
-              </li>
-            }
-          }
-          <li class="page-item" [class.disabled]="paginated().page >= paginated().totalPages">
-            <button
-              class="page-link"
-              type="button"
-              [disabled]="paginated().page >= paginated().totalPages"
-              aria-label="Página siguiente"
-              (click)="goToPage(paginated().page + 1)"
-            >
-              <i class="bi bi-chevron-right" aria-hidden="true"></i>
-            </button>
-          </li>
-        </ul>
-      </nav>
+  </section>
+} @else {
+  <section class="card shadow-sm" aria-labelledby="id-search-title">
+    <div class="card-body p-4">
+      <h2 id="id-search-title" class="h5 mb-1">Consulta por ID</h2>
+      <p class="text-secondary small mb-3">Ingresa el identificador para ver la ficha completa del producto.</p>
+      <form class="d-flex flex-wrap gap-2" (submit)="$event.preventDefault(); buscarPorId()">
+        <div class="input-group id-search-input">
+          <span class="input-group-text"><i class="bi bi-hash" aria-hidden="true"></i></span>
+          <input
+            type="number"
+            class="form-control"
+            id="search-id"
+            name="searchId"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            placeholder="Ej.: 12"
+            aria-label="ID del producto"
+            [class.is-invalid]="idError()"
+            [ngModel]="idQuery()"
+            (ngModelChange)="idQuery.set($event)"
+          >
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="idSearching()">
+          <i class="bi bi-search me-1" aria-hidden="true"></i> {{ idSearching() ? 'Buscando…' : 'Buscar' }}
+        </button>
+        @if (idQuery() || idResult() || idError()) {
+          <button type="button" class="btn btn-outline-secondary" (click)="clearIdSearch()">Limpiar</button>
+        }
+      </form>
     </div>
-  }
-</section>
+
+    <div aria-live="polite">
+      @if (idSearching()) {
+        <div class="border-top text-center py-5" role="status">
+          <div class="spinner-border text-primary" aria-hidden="true"></div>
+          <p class="mt-3 text-secondary mb-0">Buscando producto…</p>
+        </div>
+      } @else if (idError()) {
+        <div class="border-top text-center py-5 px-3">
+          <i class="bi bi-search fs-1 text-secondary" aria-hidden="true"></i>
+          <p class="mt-3 mb-0">{{ idError() }}</p>
+        </div>
+      } @else if (idResult(); as r) {
+        <div class="border-top p-4">
+          <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+            <div>
+              <p class="small text-secondary text-uppercase fw-semibold mb-1">Producto #{{ r.id }}</p>
+              <h3 class="h3 mb-2">{{ r.nombre }}</h3>
+              <span class="badge badge-imo">{{ r.imo }}</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-secondary" (click)="openEditForm(r)">
+                <i class="bi bi-pencil me-1" aria-hidden="true"></i> Editar
+              </button>
+              <button type="button" class="btn btn-outline-danger" (click)="askDelete(r)">
+                <i class="bi bi-trash me-1" aria-hidden="true"></i> Eliminar
+              </button>
+            </div>
+          </div>
+          <div class="row g-3 mt-2">
+            <div class="col-sm-6">
+              <div class="detail-tile">
+                <p class="small text-secondary text-uppercase fw-semibold mb-1">Bodega</p>
+                <p class="fs-5 mb-0"><i class="bi bi-building me-2 text-secondary" aria-hidden="true"></i>{{ r.bodega }}</p>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="detail-tile">
+                <p class="small text-secondary text-uppercase fw-semibold mb-1">Cantidad en stock</p>
+                <p class="fs-5 mb-0" [class.text-warning-emphasis]="r.cantidad < 300">
+                  <i class="bi bi-boxes me-2 text-secondary" aria-hidden="true"></i>{{ formatQuantity(r.cantidad) }}
+                  @if (r.cantidad < 300) {
+                    <span class="badge text-bg-warning ms-2 align-middle">Stock bajo</span>
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="border-top text-center py-5 px-3 text-secondary">
+          <i class="bi bi-upc-scan fs-1" aria-hidden="true"></i>
+          <p class="mt-3 mb-0">Ingresa un ID y presiona «Buscar».</p>
+        </div>
+      }
+    </div>
+  </section>
+}
 
 @if (showFormModal()) {
   <div class="modal-backdrop-manual" (click)="closeFormModal()"></div>

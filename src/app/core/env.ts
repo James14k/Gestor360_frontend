@@ -1,10 +1,5 @@
 /**
- * Configuracion centralizada del frontend Pedidos360.
- *
- * IMPORTANTE: valores a reemplazar segun avances con la infraestructura AWS:
- * - apiBaseUrl: URL del stage de API Gateway (Bloque D). Mientras tanto apunta
- *   al backend local para poder seguir desarrollando la UI.
- * - cognito.*: datos del User Pool / App Client creados en el Bloque C.
+ * Configuracion AWS 
  */
 export const ENV = {
   appName: 'Pedidos360',
