@@ -1,0 +1,90 @@
+<a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
+<div class="app-layout">
+  <header class="app-topbar navbar navbar-expand-lg border-bottom bg-body sticky-top">
+    <div class="container-fluid px-3 px-lg-4">
+      <button
+        class="btn btn-outline-secondary d-lg-none me-2"
+        type="button"
+        aria-label="Abrir menú"
+        (click)="toggleMobileMenu()"
+      >
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" routerLink="/">
+        <span class="app-brand-mark" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+        <span>{{ env.appName }}</span>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <p class="app-topbar-tagline mb-0 d-none d-md-block">{{ env.companyLine }}</p>
+        @if (auth.isAuthenticated()) {
+          <div class="d-flex align-items-center gap-2">
+            <span class="small text-secondary d-none d-sm-inline">
+              <i class="bi bi-person-circle me-1" aria-hidden="true"></i>{{ auth.username() }}
+            </span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="logout()">
+              <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Cerrar sesión
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  @if (mobileMenuOpen()) {
+    <div class="app-sidebar-backdrop d-lg-none" (click)="closeMobileMenu()"></div>
+    <aside class="app-sidebar-mobile is-open d-lg-none">
+      <nav class="app-sidebar-nav" aria-label="Navegación principal">
+        <div class="px-3 py-3">
+          <p class="text-uppercase text-secondary small fw-semibold mb-2 px-2">Operaciones</p>
+          <ul class="nav nav-pills flex-column gap-1">
+            @for (item of navItems; track item.path) {
+              <li class="nav-item">
+                <a
+                  class="nav-link app-sidebar-link"
+                  [routerLink]="item.path"
+                  routerLinkActive="active"
+                  (click)="closeMobileMenu()"
+                >
+                  <i class="bi" [class]="'bi-' + item.icon" aria-hidden="true"></i>
+                  <span>{{ item.label }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      </nav>
+    </aside>
+  }
+
+  <aside class="app-sidebar d-none d-lg-block border-end">
+    <nav class="app-sidebar-nav" aria-label="Navegación principal">
+      <div class="px-3 py-3">
+        <p class="text-uppercase text-secondary small fw-semibold mb-2 px-2">Operaciones</p>
+        <ul class="nav nav-pills flex-column gap-1">
+          @for (item of navItems; track item.path) {
+            <li class="nav-item">
+              <a class="nav-link app-sidebar-link" [routerLink]="item.path" routerLinkActive="active">
+                <i class="bi" [class]="'bi-' + item.icon" aria-hidden="true"></i>
+                <span>{{ item.label }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="app-main" id="main-content">
+    <div class="container-fluid px-3 px-lg-4 py-4">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <footer class="app-footer border-top bg-body-tertiary">
+    <div class="container-fluid px-3 px-lg-4 py-3 small text-secondary d-flex flex-wrap justify-content-between gap-2">
+      <span>&copy; {{ year }} {{ env.appName }} — {{ env.appTagline }}</span>
+      <span class="text-secondary">Sistema de gestión Suspel</span>
+    </div>
+  </footer>
+</div>

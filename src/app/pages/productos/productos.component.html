@@ -1,0 +1,338 @@
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Productos Suspel</h1>
+    <p class="text-secondary mb-0">Registro, actualización y control de existencias por bodega.</p>
+  </div>
+  <button type="button" class="btn btn-primary" (click)="openCreateForm()">
+    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Nuevo producto
+  </button>
+</div>
+
+<section class="card shadow-sm mb-3" aria-labelledby="filters-title">
+  <div class="card-body">
+    <h2 id="filters-title" class="h6 text-secondary text-uppercase fw-semibold mb-3">Filtros y búsqueda</h2>
+    <form class="row g-3 align-items-end" (submit)="$event.preventDefault()">
+      <div class="col-md-4">
+        <label for="filter-q" class="form-label">Buscar</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
+          <input
+            type="search"
+            class="form-control"
+            id="filter-q"
+            autocomplete="off"
+            placeholder="Nombre, IMO o bodega"
+            [ngModel]="filterQ()"
+            (ngModelChange)="filterQ.set($event); onFiltersChanged()"
+            name="q"
+          >
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label for="filter-bodega" class="form-label">Bodega</label>
+        <select
+          class="form-select"
+          id="filter-bodega"
+          name="bodega"
+          [ngModel]="filterBodega()"
+          (ngModelChange)="filterBodega.set($event); onFiltersChanged()"
+        >
+          <option value="">Todas</option>
+          @for (b of bodegaOptions(); track b) {
+            <option [value]="b">{{ b }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="filter-imo" class="form-label">Clase IMO</label>
+        <select
+          class="form-select"
+          id="filter-imo"
+          name="imoClass"
+          [ngModel]="filterImoClass()"
+          (ngModelChange)="filterImoClass.set($event); onFiltersChanged()"
+        >
+          <option value="">Todas</option>
+          @for (c of imoClassOptions(); track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-2 d-grid">
+        <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Limpiar</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="card shadow-sm" aria-labelledby="products-table-title">
+  <div class="card-header bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-2 py-3">
+    <div>
+      <h2 id="products-table-title" class="h5 mb-0">Listado de productos</h2>
+      <p class="small text-secondary mb-0" aria-live="polite">
+        @if (!loading() && !loadError()) {
+          Mostrando {{ paginated().items.length }} de {{ paginated().total }} resultado{{ paginated().total === 1 ? '' : 's' }}.
+        }
+      </p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <label for="page-size" class="small text-secondary mb-0">Filas</label>
+      <select
+        class="form-select form-select-sm w-auto"
+        id="page-size"
+        [ngModel]="pageSize()"
+        (ngModelChange)="onPageSizeChange($event)"
+      >
+        @for (n of pageSizeOptions; track n) {
+          <option [value]="n">{{ n }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    @if (loading()) {
+      <div class="text-center py-5" role="status">
+        <div class="spinner-border text-primary" aria-hidden="true"></div>
+        <p class="mt-3 text-secondary mb-0">Cargando productos…</p>
+      </div>
+    } @else if (loadError()) {
+      <div class="p-4">
+        <div class="alert alert-danger mb-0" role="alert">
+          <h3 class="h6 alert-heading">Error al cargar productos</h3>
+          <p class="mb-0">{{ loadError() }}</p>
+        </div>
+      </div>
+    } @else if (!paginated().items.length) {
+      <div class="empty-state py-5 px-3 text-center">
+        <i class="bi bi-inbox fs-1 text-secondary" aria-hidden="true"></i>
+        <h3 class="h5 mt-3">Sin resultados</h3>
+        <p class="text-secondary mb-3">
+          {{ productos().length ? 'Prueba ajustando los filtros de búsqueda.' : 'Crea el primer producto Suspel con el botón «Nuevo producto».' }}
+        </p>
+        @if (!productos().length) {
+          <button type="button" class="btn btn-primary" (click)="openCreateForm()">Crear producto</button>
+        }
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 app-table">
+          <thead>
+            <tr>
+              <th scope="col">
+                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'id'" (click)="toggleSort('id')">
+                  ID <i class="bi" [class]="'bi-' + sortIcon('id')" aria-hidden="true"></i>
+                </button>
+              </th>
+              <th scope="col">
+                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'nombre'" (click)="toggleSort('nombre')">
+                  Nombre <i class="bi" [class]="'bi-' + sortIcon('nombre')" aria-hidden="true"></i>
+                </button>
+              </th>
+              <th scope="col">
+                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'imo'" (click)="toggleSort('imo')">
+                  Clasificación IMO <i class="bi" [class]="'bi-' + sortIcon('imo')" aria-hidden="true"></i>
+                </button>
+              </th>
+              <th scope="col">
+                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'bodega'" (click)="toggleSort('bodega')">
+                  Bodega <i class="bi" [class]="'bi-' + sortIcon('bodega')" aria-hidden="true"></i>
+                </button>
+              </th>
+              <th scope="col" class="text-end">
+                <button type="button" class="btn btn-link btn-sm table-sort-btn p-0" [class.active]="sortKey() === 'cantidad'" (click)="toggleSort('cantidad')">
+                  Cantidad <i class="bi" [class]="'bi-' + sortIcon('cantidad')" aria-hidden="true"></i>
+                </button>
+              </th>
+              <th scope="col" class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of paginated().items; track p.id) {
+              <tr>
+                <td data-label="ID">{{ p.id }}</td>
+                <td data-label="Nombre">{{ p.nombre }}</td>
+                <td data-label="IMO">
+                  <span class="badge badge-imo">{{ p.imo }}</span>
+                </td>
+                <td data-label="Bodega">{{ p.bodega }}</td>
+                <td data-label="Cantidad" class="text-md-end" [class.text-warning-emphasis]="p.cantidad < 300" [class.fw-semibold]="p.cantidad < 300">
+                  {{ formatQuantity(p.cantidad) }}
+                </td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm" role="group" [attr.aria-label]="'Acciones para ' + p.nombre">
+                    <button type="button" class="btn btn-outline-secondary" [attr.aria-label]="'Editar ' + p.nombre" (click)="openEditForm(p)">
+                      <i class="bi bi-pencil" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" [attr.aria-label]="'Eliminar ' + p.nombre" (click)="askDelete(p)">
+                      <i class="bi bi-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  @if (!loading() && !loadError() && paginated().totalPages > 1) {
+    <div class="card-footer bg-transparent d-flex justify-content-center py-3">
+      <nav aria-label="Paginación de resultados">
+        <ul class="pagination pagination-sm mb-0 justify-content-center flex-wrap">
+          <li class="page-item" [class.disabled]="paginated().page <= 1">
+            <button class="page-link" type="button" [disabled]="paginated().page <= 1" aria-label="Página anterior" (click)="goToPage(paginated().page - 1)">
+              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            </button>
+          </li>
+          @for (p of pageList(); track $index) {
+            @if (p === '…') {
+              <li class="page-item disabled"><span class="page-link">…</span></li>
+            } @else {
+              <li class="page-item" [class.active]="p === paginated().page">
+                <button class="page-link" type="button" (click)="goToPage(p)">{{ p }}</button>
+              </li>
+            }
+          }
+          <li class="page-item" [class.disabled]="paginated().page >= paginated().totalPages">
+            <button
+              class="page-link"
+              type="button"
+              [disabled]="paginated().page >= paginated().totalPages"
+              aria-label="Página siguiente"
+              (click)="goToPage(paginated().page + 1)"
+            >
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  }
+</section>
+
+@if (showFormModal()) {
+  <div class="modal-backdrop-manual" (click)="closeFormModal()"></div>
+  <div class="modal modal-manual d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <form (submit)="$event.preventDefault(); submitForm()">
+          <div class="modal-header">
+            <h2 class="modal-title fs-5">{{ formMode() === 'edit' ? 'Editar producto' : 'Nuevo producto' }}</h2>
+            <button type="button" class="btn-close" aria-label="Cerrar" (click)="closeFormModal()"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="field-nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="field-nombre"
+                  name="nombre"
+                  maxlength="200"
+                  autocomplete="off"
+                  [class.is-invalid]="formErrors()['nombre']"
+                  [ngModel]="formModel().nombre"
+                  (ngModelChange)="updateFormField('nombre', $event)"
+                >
+                @if (formErrors()['nombre']) {
+                  <div class="invalid-feedback d-block">{{ formErrors()['nombre'] }}</div>
+                }
+              </div>
+              <div class="col-12">
+                <label for="field-imo" class="form-label">Clasificación IMO <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="field-imo"
+                  name="imo"
+                  maxlength="500"
+                  placeholder="Ej.: Clase 3 - Líquido Inflamable"
+                  list="imo-suggestions"
+                  autocomplete="off"
+                  [class.is-invalid]="formErrors()['imo']"
+                  [ngModel]="formModel().imo"
+                  (ngModelChange)="updateFormField('imo', $event)"
+                >
+                <datalist id="imo-suggestions">
+                  @for (s of imoSuggestions; track s) {
+                    <option [value]="s"></option>
+                  }
+                </datalist>
+                @if (formErrors()['imo']) {
+                  <div class="invalid-feedback d-block">{{ formErrors()['imo'] }}</div>
+                }
+              </div>
+              <div class="col-md-6">
+                <label for="field-bodega" class="form-label">Bodega <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="field-bodega"
+                  name="bodega"
+                  maxlength="100"
+                  autocomplete="off"
+                  [class.is-invalid]="formErrors()['bodega']"
+                  [ngModel]="formModel().bodega"
+                  (ngModelChange)="updateFormField('bodega', $event)"
+                >
+                @if (formErrors()['bodega']) {
+                  <div class="invalid-feedback d-block">{{ formErrors()['bodega'] }}</div>
+                }
+              </div>
+              <div class="col-md-6">
+                <label for="field-cantidad" class="form-label">Cantidad <span class="text-danger">*</span></label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="field-cantidad"
+                  name="cantidad"
+                  min="0"
+                  step="1"
+                  inputmode="numeric"
+                  [class.is-invalid]="formErrors()['cantidad']"
+                  [ngModel]="formModel().cantidad"
+                  (ngModelChange)="updateFormField('cantidad', $event)"
+                >
+                @if (formErrors()['cantidad']) {
+                  <div class="invalid-feedback d-block">{{ formErrors()['cantidad'] }}</div>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="closeFormModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="saving()">
+              {{ saving() ? 'Guardando…' : (formMode() === 'edit' ? 'Guardar cambios' : 'Guardar producto') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showConfirmModal()) {
+  <div class="modal-backdrop-manual" (click)="cancelDelete()"></div>
+  <div class="modal modal-manual d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5">Eliminar producto</h2>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="cancelDelete()"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">¿Eliminar «{{ confirmTarget()?.nombre }}»? Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="cancelDelete()">Cancelar</button>
+          <button type="button" class="btn btn-danger" [disabled]="deleting()" (click)="confirmDelete()">
+            {{ deleting() ? 'Eliminando…' : 'Eliminar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

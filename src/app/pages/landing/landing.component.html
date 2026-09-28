@@ -1,0 +1,141 @@
+<a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
+
+<header class="border-bottom public-nav sticky-top">
+  <nav class="navbar navbar-expand-lg container py-3" aria-label="Navegación principal">
+    <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" routerLink="/">
+      <span class="app-brand-mark" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+      {{ env.appName }}
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      [attr.aria-expanded]="navOpen()"
+      aria-controls="publicNav"
+      aria-label="Alternar navegación"
+      (click)="toggleNav()"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" [class.show]="navOpen()" id="publicNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+        <li class="nav-item"><a class="nav-link" href="#solucion">Solución</a></li>
+        @if (auth.isAuthenticated()) {
+          <li class="nav-item"><a class="nav-link" routerLink="/dashboard">Panel</a></li>
+          <li class="nav-item">
+            <a class="btn btn-primary ms-lg-2" routerLink="/productos">
+              <i class="bi bi-boxes me-1" aria-hidden="true"></i> Inventario
+            </a>
+          </li>
+        } @else {
+          <li class="nav-item">
+            <button type="button" class="btn btn-primary ms-lg-2" (click)="login()">
+              <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main id="contenido-principal">
+  <section class="landing-hero py-5 py-lg-6">
+    <div class="container py-lg-4">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <p class="text-uppercase small fw-semibold eyebrow mb-2">Pedidos360 · Operaciones Suspel</p>
+          <h1 class="display-5 fw-bold mb-3">Control de inventario con enfoque en seguridad y trazabilidad</h1>
+          <p class="lead text-secondary mb-4">
+            Plataforma de gestión para equipos que administran sustancias peligrosas: stock por bodega,
+            clasificación IMO y seguimiento operativo desde un mismo panel.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            @if (auth.isAuthenticated()) {
+              <a routerLink="/productos" class="btn btn-primary btn-lg">
+                <i class="bi bi-box-seam me-1" aria-hidden="true"></i> Acceder al inventario
+              </a>
+              <a routerLink="/dashboard" class="btn btn-outline-primary btn-lg">Ver panel de control</a>
+            } @else {
+              <button type="button" class="btn btn-primary btn-lg" (click)="login()">
+                <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
+              </button>
+            }
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card hero-panel shadow-sm">
+            <div class="card-body p-4">
+              <h2 class="h5 mb-3">Su operación, en un solo lugar</h2>
+              <ul class="list-unstyled mb-0">
+                <li class="d-flex gap-3 mb-3">
+                  <i class="bi bi-building text-accent fs-5" aria-hidden="true"></i>
+                  <span>Organización por bodegas y ubicaciones de almacenamiento.</span>
+                </li>
+                <li class="d-flex gap-3 mb-3">
+                  <i class="bi bi-shield-exclamation text-accent fs-5" aria-hidden="true"></i>
+                  <span>Clasificación IMO visible en cada producto registrado.</span>
+                </li>
+                <li class="d-flex gap-3 mb-3">
+                  <i class="bi bi-graph-up-arrow text-accent fs-5" aria-hidden="true"></i>
+                  <span>Indicadores de stock y alertas de niveles críticos en el panel.</span>
+                </li>
+                <li class="d-flex gap-3">
+                  <i class="bi bi-pencil-square text-accent fs-5" aria-hidden="true"></i>
+                  <span>Altas, modificaciones y bajas de productos con validación de datos.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="solucion" class="py-5 bg-body">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="h3 fw-semibold">Pensado para equipos de logística y cumplimiento</h2>
+        <p class="text-secondary mb-0 col-lg-8 mx-auto">
+          Pedidos360 concentra la información que su empresa necesita para operar con orden,
+          sin distracciones técnicas en pantalla.
+        </p>
+      </div>
+      <div class="row g-4">
+        <article class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="feature-icon mb-3" aria-hidden="true"><i class="bi bi-clipboard-data"></i></div>
+              <h3 class="h5">Inventario centralizado</h3>
+              <p class="text-secondary mb-0">Consulte cantidades, bodegas y fichas de producto desde un listado claro y filtrable.</p>
+            </div>
+          </div>
+        </article>
+        <article class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="feature-icon mb-3" aria-hidden="true"><i class="bi bi-bar-chart-line"></i></div>
+              <h3 class="h5">Panel ejecutivo</h3>
+              <p class="text-secondary mb-0">Resumen de unidades, bodegas activas y productos con stock bajo para decisiones rápidas.</p>
+            </div>
+          </div>
+        </article>
+        <article class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="feature-icon mb-3" aria-hidden="true"><i class="bi bi-phone"></i></div>
+              <h3 class="h5">Uso en terreno y oficina</h3>
+              <p class="text-secondary mb-0">Interfaz adaptable a computador, tablet y móvil para consultas en planta o en despacho.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="border-top py-4 public-footer">
+  <div class="container small text-secondary d-flex flex-wrap justify-content-between gap-2">
+    <span>{{ env.appName }} — {{ env.appTagline }}</span>
+    <span>Sistema de gestión empresarial</span>
+  </div>
+</footer>

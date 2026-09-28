@@ -1,0 +1,152 @@
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Panel de control</h1>
+    <p class="text-secondary mb-0">Vista general de stock, bodegas y clasificación IMO de su operación.</p>
+  </div>
+  <a routerLink="/productos" class="btn btn-primary">
+    <i class="bi bi-boxes me-1" aria-hidden="true"></i> Gestionar productos
+  </a>
+</div>
+
+@if (loading()) {
+  <div class="text-center py-5" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="mt-3 text-secondary mb-0">Cargando datos del inventario…</p>
+  </div>
+} @else if (errorMsg()) {
+  <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+    <i class="bi bi-exclamation-octagon-fill fs-5" aria-hidden="true"></i>
+    <div>
+      <h2 class="h6 alert-heading mb-1">No se pudo obtener la información</h2>
+      <p class="mb-2">{{ env.supportHint }}</p>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="reload()">Reintentar</button>
+    </div>
+  </div>
+} @else {
+  <section aria-labelledby="dashboard-kpis-title" class="mb-4">
+    <h2 id="dashboard-kpis-title" class="visually-hidden">Indicadores principales</h2>
+    <div class="row g-3">
+      <div class="col-sm-6 col-xl-3">
+        <article class="card kpi-card shadow-sm border-0 h-100">
+          <div class="card-body d-flex align-items-center gap-3">
+            <div class="kpi-icon kpi-icon--brand rounded-3 p-3"><i class="bi bi-boxes fs-4" aria-hidden="true"></i></div>
+            <div>
+              <p class="text-secondary small mb-1">Productos registrados</p>
+              <p class="h4 mb-0 fw-semibold">{{ formatQuantity(totalProductos()) }}</p>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <article class="card kpi-card shadow-sm border-0 h-100">
+          <div class="card-body d-flex align-items-center gap-3">
+            <div class="kpi-icon kpi-icon--brand rounded-3 p-3"><i class="bi bi-stack fs-4" aria-hidden="true"></i></div>
+            <div>
+              <p class="text-secondary small mb-1">Unidades en stock</p>
+              <p class="h4 mb-0 fw-semibold">{{ formatQuantity(totalUnidades()) }}</p>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <article class="card kpi-card shadow-sm border-0 h-100">
+          <div class="card-body d-flex align-items-center gap-3">
+            <div class="kpi-icon kpi-icon--accent rounded-3 p-3"><i class="bi bi-building fs-4" aria-hidden="true"></i></div>
+            <div>
+              <p class="text-secondary small mb-1">Bodegas activas</p>
+              <p class="h4 mb-0 fw-semibold">{{ formatQuantity(bodegasActivas()) }}</p>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="col-sm-6 col-xl-3">
+        <article class="card kpi-card shadow-sm border-0 h-100">
+          <div class="card-body d-flex align-items-center gap-3">
+            <div class="kpi-icon kpi-icon--accent rounded-3 p-3"><i class="bi bi-shield-exclamation fs-4" aria-hidden="true"></i></div>
+            <div>
+              <p class="text-secondary small mb-1">Clases IMO</p>
+              <p class="h4 mb-0 fw-semibold">{{ formatQuantity(clasesImo()) }}</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0">
+          <h2 class="h5 card-title mb-0">Stock bajo (&lt; 300 u.)</h2>
+        </div>
+        <div class="card-body">
+          @if (lowStock().length) {
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Bodega</th>
+                    <th scope="col" class="text-end">Cantidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of lowStock(); track p.id) {
+                    <tr>
+                      <td>{{ p.nombre }}</td>
+                      <td>{{ p.bodega }}</td>
+                      <td class="text-end">
+                        <span class="badge text-bg-warning-subtle border text-warning-emphasis">{{ formatQuantity(p.cantidad) }}</span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="text-center text-secondary py-4">
+              <i class="bi bi-inbox fs-2 d-block mb-2" aria-hidden="true"></i>
+              <p class="mb-0">No hay productos con stock bajo en este momento.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0">
+          <h2 class="h5 card-title mb-0">Distribución por bodega</h2>
+        </div>
+        <div class="card-body">
+          @if (bodegaBreakdown().length) {
+            <ul class="list-group list-group-flush">
+              @for (b of bodegaBreakdown(); track b.bodega) {
+                <li class="list-group-item px-0">
+                  <div class="d-flex justify-content-between small mb-1">
+                    <span>{{ b.bodega }}</span>
+                    <span class="text-secondary">{{ formatQuantity(b.count) }} productos</span>
+                  </div>
+                  <div
+                    class="progress progress-thin"
+                    role="progressbar"
+                    [attr.aria-valuenow]="b.widthPct"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    [attr.aria-label]="'Productos en ' + b.bodega"
+                  >
+                    <div class="progress-bar" [style.width.%]="b.widthPct"></div>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="text-center text-secondary py-4">
+              <i class="bi bi-inbox fs-2 d-block mb-2" aria-hidden="true"></i>
+              <p class="mb-0">Sin datos de bodegas.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
