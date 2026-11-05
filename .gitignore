@@ -42,3 +42,30 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Angular (todo el directorio local, no solo cache)
+/.angular
+
+# Documentacion y diseño (no se versiona)
+/docs
+*.drawio
+*.drawio.bkp
+*.docx
+*.doc
+*.pdf
+*.pptx
+*.xlsx
+~$*
+
+# Logs
+*.log
+
+# Secretos / credenciales (AWS, env)
+.env
+.env.*
+*.pem
+*.key
+*.ppk
+
+# Herramientas locales
+.claude/
