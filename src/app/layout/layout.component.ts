@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ENV } from '../core/env';
 import { AuthService } from '../core/auth/auth.service';
 import { iniciales } from '../shared/format.util';
+import { NotificacionesBellComponent } from '../shared/notificaciones-bell/notificaciones-bell.component';
 
 interface NavItem {
   path: string;
@@ -13,7 +14,7 @@ interface NavItem {
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, NotificacionesBellComponent],
   templateUrl: './layout.component.html',
 })
 export class LayoutComponent {

@@ -784,3 +784,42 @@ body {
   font-weight: 600;
   color: #334155;
 }
+
+.bell-badge {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.15rem;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1.1rem;
+  text-align: center;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.bell-click-away {
+  position: fixed;
+  inset: 0;
+  z-index: 1039;
+}
+
+.bell-dropdown {
+  width: 20rem;
+}
+
+.bell-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.bell-item.is-new {
+  background: #fffbeb;
+}
