@@ -1,48 +1,27 @@
-import { Component, effect, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, effect, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { ENV } from '../../core/env';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink],
   templateUrl: './landing.component.html',
 })
 export class LandingComponent {
   protected readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   protected readonly env = ENV;
-  protected readonly navOpen = signal(false);
-  protected readonly token = signal<string | null>(null);
-  protected readonly copied = signal(false);
 
   constructor() {
     effect(() => {
       if (this.auth.isAuthenticated()) {
-        void this.auth.getAccessToken().then((token) => this.token.set(token));
-      } else {
-        this.token.set(null);
+        void this.router.navigateByUrl('/inicio');
       }
     });
   }
 
-  async copyToken(): Promise<void> {
-    const token = this.token();
-    if (!token) return;
-    try {
-      await navigator.clipboard.writeText(token);
-      this.copied.set(true);
-      setTimeout(() => this.copied.set(false), 2000);
-    } catch {
-      this.copied.set(false);
-    }
-  }
-
   login(): void {
     void this.auth.login();
-  }
-
-  toggleNav(): void {
-    this.navOpen.update((open) => !open);
   }
 }

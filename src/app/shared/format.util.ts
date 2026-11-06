@@ -19,3 +19,12 @@ export function compareStrings(a: unknown, b: unknown): number {
 export function compareNumbers(a: unknown, b: unknown): number {
   return (Number(a) || 0) - (Number(b) || 0);
 }
+
+/** Iniciales para el avatar: "emilio.jaramillo@dominio.cl" -> "EJ", "Ana" -> "A". */
+export function iniciales(nombre: string | null | undefined): string {
+  if (!nombre) return '?';
+  const base = nombre.split('@')[0];
+  const partes = base.split(/[\s._-]+/).filter(Boolean);
+  const letras = partes.length > 1 ? partes[0][0] + partes[1][0] : base.slice(0, 2);
+  return letras.toUpperCase();
+}

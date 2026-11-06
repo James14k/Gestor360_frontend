@@ -2,33 +2,13 @@
 
 <header class="border-bottom public-nav sticky-top">
   <nav class="navbar navbar-expand-lg container py-3" aria-label="Navegación principal">
-    <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" routerLink="/">
-      <span class="app-brand-mark" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
-      {{ env.appName }}
-    </a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      [attr.aria-expanded]="navOpen()"
-      aria-controls="publicNav"
-      aria-label="Alternar navegación"
-      (click)="toggleNav()"
-    >
-      <span class="navbar-toggler-icon"></span>
+    <span class="app-brand mb-0">
+      <span class="app-brand-mark" aria-hidden="true"><i class="bi bi-box-seam"></i></span>
+      <span class="app-brand-text"><span class="brand-green">Pedidos</span><span class="brand-red">360</span></span>
+    </span>
+    <button type="button" class="btn btn-primary ms-auto" (click)="login()">
+      <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
     </button>
-    <div class="collapse navbar-collapse" [class.show]="navOpen()" id="publicNav">
-      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-        <li class="nav-item"><a class="nav-link" href="#token">Token</a></li>
-        @if (auth.isAuthenticated()) {
-          <li class="nav-item"><a class="nav-link" routerLink="/dashboard">Panel</a></li>
-          <li class="nav-item">
-            <a class="btn btn-primary ms-lg-2" routerLink="/productos">
-              <i class="bi bi-boxes me-1" aria-hidden="true"></i> Inventario
-            </a>
-          </li>
-        }
-      </ul>
-    </div>
   </nav>
 </header>
 
@@ -43,16 +23,9 @@
             Stock por bodega y clasificación IMO en un solo lugar.
           </p>
           <div class="d-flex flex-wrap gap-2 reveal reveal-4">
-            @if (auth.isAuthenticated()) {
-              <a routerLink="/productos" class="btn btn-primary btn-lg">
-                <i class="bi bi-box-seam me-1" aria-hidden="true"></i> Acceder al inventario
-              </a>
-              <a routerLink="/dashboard" class="btn btn-outline-primary btn-lg">Ver panel de control</a>
-            } @else {
-              <button type="button" class="btn btn-primary btn-lg" (click)="login()">
-                <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
-              </button>
-            }
+            <button type="button" class="btn btn-primary btn-lg" (click)="login()">
+              <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
+            </button>
           </div>
         </div>
         <div class="col-lg-6">
@@ -88,47 +61,6 @@
                 </li>
               </ul>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="token" class="py-5 bg-body">
-    <div class="container">
-      <div class="text-center mb-4">
-        <h2 class="h3 fw-semibold">Token</h2>
-        <p class="text-secondary mb-0">Access Token de la sesión actual.</p>
-      </div>
-      <div class="col-lg-10 mx-auto">
-        <div class="card token-card">
-          <div class="card-body p-4">
-            @if (auth.isAuthenticated()) {
-              @if (token(); as t) {
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-                  <span class="small text-secondary text-uppercase fw-semibold">
-                    <i class="bi bi-key me-1" aria-hidden="true"></i> Bearer token · {{ auth.displayName() }}
-                  </span>
-                  <button type="button" class="btn btn-sm btn-outline-primary" (click)="copyToken()">
-                    <i class="bi me-1" [class.bi-clipboard]="!copied()" [class.bi-clipboard-check]="copied()" aria-hidden="true"></i>
-                    {{ copied() ? 'Copiado' : 'Copiar' }}
-                  </button>
-                </div>
-                <pre class="token-value mb-0" tabindex="0">{{ t }}</pre>
-              } @else {
-                <div class="text-center py-4 text-secondary" role="status">
-                  <div class="spinner-border spinner-border-sm me-2" aria-hidden="true"></div> Obteniendo token…
-                </div>
-              }
-            } @else {
-              <div class="text-center py-4">
-                <i class="bi bi-lock fs-2 text-secondary" aria-hidden="true"></i>
-                <p class="text-secondary mt-2 mb-3">Inicia sesión para ver tu token.</p>
-                <button type="button" class="btn btn-primary" (click)="login()">
-                  <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión
-                </button>
-              </div>
-            }
           </div>
         </div>
       </div>

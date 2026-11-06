@@ -4,6 +4,7 @@ import { LayoutComponent } from './layout/layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ProductosComponent } from './pages/productos/productos.component';
 import { ActividadComponent } from './pages/actividad/actividad.component';
+import { InicioComponent } from './pages/inicio/inicio.component';
 import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
@@ -13,6 +14,7 @@ export const routes: Routes = [
     component: LayoutComponent,
     canActivate: [authGuard],
     children: [
+      { path: 'inicio', component: InicioComponent },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'productos', component: ProductosComponent },
       { path: 'actividad', component: ActividadComponent },

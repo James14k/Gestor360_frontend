@@ -1,0 +1,55 @@
+<h1 class="page-title mb-4">Inicio</h1>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-body welcome-card d-flex align-items-center gap-3">
+        <span class="app-avatar app-avatar-lg">{{ iniciales() }}</span>
+        <div class="flex-grow-1 min-w-0 lh-sm">
+          <div class="fw-semibold">Bienvenida/o</div>
+          <div class="small text-secondary text-truncate mt-1">{{ auth.displayName() }} · Operaciones Suspel</div>
+        </div>
+        <button type="button" class="btn btn-soft btn-sm d-inline-flex align-items-center gap-1" (click)="logout()">
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Salir
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-body welcome-card d-flex align-items-center gap-3">
+        <span class="app-brand-mark" aria-hidden="true"><i class="bi bi-box-seam"></i></span>
+        <div class="min-w-0 lh-sm">
+          <div class="fw-semibold">Periodo: {{ periodo }}</div>
+          <div class="small text-secondary mt-1">{{ env.appName }} · {{ env.appTagline }}</div>
+          <div class="small text-secondary opacity-75 mt-1">Hoy es {{ fechaHoy }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="photo-carousel" (mouseenter)="pausar(true)" (mouseleave)="pausar(false)">
+  @for (foto of fotos; track foto.src; let i = $index) {
+    <img [src]="foto.src" [alt]="foto.titulo" [class.is-active]="i === indice()" />
+  }
+  <div class="photo-carousel-shade"></div>
+  <div class="photo-carousel-caption">
+    <div>
+      <div class="fs-5 fw-semibold">Bodega Suspel</div>
+      <div class="small opacity-75">{{ fotos[indice()].titulo }}</div>
+    </div>
+    <div class="d-flex align-items-center gap-2 pb-1">
+      @for (foto of fotos; track foto.src; let i = $index) {
+        <button
+          type="button"
+          class="photo-carousel-dot"
+          [class.is-active]="i === indice()"
+          [attr.aria-label]="'Ver foto: ' + foto.titulo"
+          [attr.aria-current]="i === indice()"
+          (click)="irA(i)"
+        ></button>
+      }
+    </div>
+  </div>
+</div>
