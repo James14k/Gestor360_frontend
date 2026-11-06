@@ -9,8 +9,7 @@ interface Foto {
 }
 
 const FOTOS: Foto[] = [
-  { src: 'img/bodega-hero.jpg', titulo: 'Patio de recepción y despacho' },
-  { src: 'img/bodega-patio.jpg', titulo: 'Zona de carga y maniobras' },
+  { src: 'img/bodega-patio.jpg', titulo: 'Patio de recepción y despacho' },
   { src: 'img/bodega-andenes-8.jpg', titulo: 'Andenes de despacho' },
 ];
 
