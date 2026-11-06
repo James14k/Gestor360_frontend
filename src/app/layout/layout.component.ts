@@ -23,6 +23,7 @@ export class LayoutComponent {
   protected readonly navItems: NavItem[] = [
     { path: '/dashboard', label: 'Panel', icon: 'speedometer2' },
     { path: '/productos', label: 'Productos', icon: 'boxes' },
+    { path: '/actividad', label: 'Actividad', icon: 'activity' },
   ];
 
   protected readonly year = new Date().getFullYear();

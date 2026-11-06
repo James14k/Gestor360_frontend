@@ -3,6 +3,7 @@ import { LandingComponent } from './pages/landing/landing.component';
 import { LayoutComponent } from './layout/layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ProductosComponent } from './pages/productos/productos.component';
+import { ActividadComponent } from './pages/actividad/actividad.component';
 import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
@@ -14,6 +15,7 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'productos', component: ProductosComponent },
+      { path: 'actividad', component: ActividadComponent },
     ],
   },
   { path: '**', redirectTo: '' },

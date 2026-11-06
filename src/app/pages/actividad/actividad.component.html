@@ -1,0 +1,153 @@
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Actividad del sistema</h1>
+    <p class="text-secondary mb-0">Bitácora de cambios, alertas de stock y fichas de almacenamiento generadas.</p>
+  </div>
+  <button type="button" class="btn btn-outline-primary" (click)="recargar()" [disabled]="loading()">
+    <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i> Actualizar
+  </button>
+</div>
+
+<ul class="nav nav-tabs mb-3" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button
+      type="button"
+      class="nav-link"
+      role="tab"
+      [class.active]="pestana() === 'auditoria'"
+      [attr.aria-selected]="pestana() === 'auditoria'"
+      (click)="seleccionar('auditoria')"
+    >
+      <i class="bi bi-journal-text me-1" aria-hidden="true"></i> Auditoría
+      <span class="badge rounded-pill text-bg-light border ms-1">{{ auditoria().length }}</span>
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button
+      type="button"
+      class="nav-link"
+      role="tab"
+      [class.active]="pestana() === 'notificaciones'"
+      [attr.aria-selected]="pestana() === 'notificaciones'"
+      (click)="seleccionar('notificaciones')"
+    >
+      <i class="bi bi-bell me-1" aria-hidden="true"></i> Alertas de stock
+      <span class="badge rounded-pill text-bg-light border ms-1">{{ notificaciones().length }}</span>
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button
+      type="button"
+      class="nav-link"
+      role="tab"
+      [class.active]="pestana() === 'fichas'"
+      [attr.aria-selected]="pestana() === 'fichas'"
+      (click)="seleccionar('fichas')"
+    >
+      <i class="bi bi-file-earmark-text me-1" aria-hidden="true"></i> Fichas
+      <span class="badge rounded-pill text-bg-light border ms-1">{{ fichas().length }}</span>
+    </button>
+  </li>
+</ul>
+
+@if (loading()) {
+  <div class="text-center py-5" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
+    <p class="mt-3 text-secondary mb-0">Cargando actividad…</p>
+  </div>
+} @else if (errorMsg()) {
+  <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+    <i class="bi bi-exclamation-octagon-fill fs-5" aria-hidden="true"></i>
+    <div>
+      <h2 class="h6 alert-heading mb-1">No se pudo obtener la actividad</h2>
+      <p class="mb-2">{{ env.supportHint }}</p>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="recargar()">Reintentar</button>
+    </div>
+  </div>
+} @else {
+  <div class="card shadow-sm">
+    <div class="card-body">
+      @switch (pestana()) {
+        @case ('auditoria') {
+          @if (auditoria().length) {
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Evento</th>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Usuario</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (r of auditoria(); track r.id) {
+                    <tr>
+                      <td class="text-nowrap">{{ fecha(r.fecha) }}</td>
+                      <td><span class="badge" [class]="etiqueta(r.tipo).clase">{{ etiqueta(r.tipo).texto }}</span></td>
+                      <td>{{ r.producto }} <span class="text-secondary small">#{{ r.productoId }}</span></td>
+                      <td>{{ r.usuario }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="text-center text-secondary py-4">
+              <i class="bi bi-inbox fs-2 d-block mb-2" aria-hidden="true"></i>
+              <p class="mb-0">Aún no hay cambios registrados en el inventario.</p>
+            </div>
+          }
+        }
+        @case ('notificaciones') {
+          @if (notificaciones().length) {
+            <ul class="list-group list-group-flush">
+              @for (n of notificaciones(); track n.id) {
+                <li class="list-group-item px-0 d-flex align-items-start gap-3">
+                  <i class="bi bi-exclamation-triangle-fill text-warning fs-5" aria-hidden="true"></i>
+                  <div class="flex-grow-1">
+                    <p class="mb-1 fw-semibold">{{ n.producto }}</p>
+                    <p class="mb-0 small text-secondary">
+                      {{ formatQuantity(n.cantidad) }} unidades en {{ n.bodega }} · {{ fecha(n.fecha) }}
+                    </p>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="text-center text-secondary py-4">
+              <i class="bi bi-bell-slash fs-2 d-block mb-2" aria-hidden="true"></i>
+              <p class="mb-0">No hay alertas de stock bajo.</p>
+            </div>
+          }
+        }
+        @case ('fichas') {
+          @if (fichas().length) {
+            <div class="row g-3">
+              @for (f of fichas(); track f.id) {
+                <div class="col-md-6 col-xl-4">
+                  <article class="card h-100 border">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge text-bg-dark">{{ f.folio }}</span>
+                        <span class="badge text-bg-warning-subtle border text-warning-emphasis">Clase {{ f.claseImo }}</span>
+                      </div>
+                      <h2 class="h6 mb-1">{{ f.producto }}</h2>
+                      <p class="small text-secondary mb-2">{{ f.bodega }} · {{ fecha(f.fecha) }}</p>
+                      <p class="small mb-0">{{ f.indicaciones }}</p>
+                    </div>
+                  </article>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="text-center text-secondary py-4">
+              <i class="bi bi-file-earmark fs-2 d-block mb-2" aria-hidden="true"></i>
+              <p class="mb-0">Aún no se han generado fichas de almacenamiento.</p>
+            </div>
+          }
+        }
+      }
+    </div>
+  </div>
+}
