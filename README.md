@@ -23,7 +23,7 @@ Abrir `src/app/core/env.ts` y comprobar que estos valores correspondan al entorn
 
 ### EC2
 
-Elastic IP: `54.87.208.71`
+Elastic IP: `<ELASTIC_IP>` (ver consola EC2)
 
 Estado del servicio:
 
