@@ -4,6 +4,7 @@ import { ENV } from '../core/env';
 import { AuthService } from '../core/auth/auth.service';
 import { iniciales } from '../shared/format.util';
 import { NotificacionesBellComponent } from '../shared/notificaciones-bell/notificaciones-bell.component';
+import { EmergenciaModalComponent } from '../shared/emergencia/emergencia-modal.component';
 
 interface NavItem {
   path: string;
@@ -14,7 +15,7 @@ interface NavItem {
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, NotificacionesBellComponent],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, NotificacionesBellComponent, EmergenciaModalComponent],
   templateUrl: './layout.component.html',
 })
 export class LayoutComponent {
@@ -22,6 +23,7 @@ export class LayoutComponent {
   protected readonly env = ENV;
   protected readonly mobileMenuOpen = signal(false);
   protected readonly cuentaAbierta = signal(false);
+  protected readonly emergenciaAbierta = signal(false);
   protected readonly iniciales = computed(() => iniciales(this.auth.displayName()));
 
   protected readonly navItems: NavItem[] = [

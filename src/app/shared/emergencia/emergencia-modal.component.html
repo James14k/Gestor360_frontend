@@ -1,0 +1,117 @@
+<div class="modal-backdrop-manual" (click)="cerrar.emit()"></div>
+<div class="modal modal-manual d-block" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="emergencia-titulo">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content emergencia-modal">
+      <div class="modal-header emergencia-header">
+        <h2 class="modal-title fs-5 d-flex align-items-center gap-2" id="emergencia-titulo">
+          <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i> Reportar emergencia
+        </h2>
+        <button type="button" class="btn-close btn-close-white" aria-label="Cerrar" (click)="cerrar.emit()"></button>
+      </div>
+
+      @if (resultado(); as r) {
+        <div class="modal-body text-center py-5">
+          <div class="emergencia-ok-icon mb-3"><i class="bi bi-check2-circle" aria-hidden="true"></i></div>
+          <h3 class="h5 mb-2">Aviso enviado a Bomberos</h3>
+          <p class="text-secondary mb-1">
+            {{ etiquetaTipo(r.tipo) }} en <strong>{{ r.bodega }}</strong> · prioridad {{ r.prioridad }} ·
+            {{ r.sustancias }} {{ r.sustancias === 1 ? 'sustancia' : 'sustancias' }} informadas
+          </p>
+          <p class="small text-secondary mb-4">
+            El aviso quedó en la cola <code>q.emergencias</code> y se despacha en orden de prioridad.
+          </p>
+          <div class="d-flex justify-content-center gap-2">
+            <a routerLink="/actividad" class="btn btn-soft" (click)="cerrar.emit()">Ver seguimiento</a>
+            <button type="button" class="btn btn-primary" (click)="cerrar.emit()">Cerrar</button>
+          </div>
+        </div>
+      } @else {
+        <div class="modal-body">
+          <p class="small text-secondary mb-3">
+            El aviso se envía a la central de Bomberos con las sustancias peligrosas almacenadas en la bodega.
+          </p>
+
+          <p class="fw-semibold small mb-2">1. Bodega afectada</p>
+          <div class="row g-2 mb-4">
+            @for (b of bodegas; track b.nombre) {
+              <div class="col-6 col-md-3">
+                <button
+                  type="button"
+                  class="emergencia-opcion w-100"
+                  [class.is-selected]="bodega() === b.nombre"
+                  [attr.aria-pressed]="bodega() === b.nombre"
+                  (click)="bodega.set(b.nombre)"
+                >
+                  <span class="fw-semibold">{{ b.nombre }}</span>
+                  <span class="small text-secondary">{{ b.uso }}</span>
+                </button>
+              </div>
+            }
+          </div>
+
+          <p class="fw-semibold small mb-2">2. Tipo de emergencia</p>
+          <div class="row g-2 mb-4">
+            @for (t of tipos; track t.tipo) {
+              <div class="col-4">
+                <button
+                  type="button"
+                  class="emergencia-opcion w-100"
+                  [class.is-selected]="tipo() === t.tipo"
+                  [attr.aria-pressed]="tipo() === t.tipo"
+                  (click)="tipo.set(t.tipo)"
+                >
+                  <i class="bi fs-4" [class]="'bi-' + t.icono" aria-hidden="true"></i>
+                  <span class="fw-semibold small">{{ t.etiqueta }}</span>
+                </button>
+              </div>
+            }
+          </div>
+
+          <label for="emergencia-detalle" class="fw-semibold small mb-2 d-block">3. Detalle (opcional)</label>
+          <textarea
+            id="emergencia-detalle"
+            class="form-control mb-4"
+            rows="2"
+            maxlength="500"
+            placeholder="Ej.: humo en el pasillo 2, sin personas atrapadas"
+            [ngModel]="detalle()"
+            (ngModelChange)="detalle.set($event)"
+          ></textarea>
+
+          @if (bodega()) {
+            <p class="fw-semibold small mb-2">Sustancias en {{ bodega() }}</p>
+            @if (cargandoProductos()) {
+              <p class="small text-secondary">Cargando…</p>
+            } @else if (sustancias().length) {
+              <ul class="list-unstyled emergencia-sustancias mb-0">
+                @for (s of sustancias(); track s.id) {
+                  <li class="d-flex align-items-center gap-2">
+                    <app-rombo-imo [imo]="s.imo" [tamano]="28" />
+                    <span class="flex-grow-1 small">{{ s.nombre }}</span>
+                    <span class="small text-secondary text-nowrap">{{ formatQuantity(s.cantidad) }} u.</span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="small text-secondary mb-0">Sin productos registrados en esta bodega.</p>
+            }
+          }
+
+          @if (error()) {
+            <div class="alert alert-danger small mt-3 mb-0" role="alert">{{ error() }}</div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-soft" (click)="cerrar.emit()">Cancelar</button>
+          <button type="button" class="btn btn-danger" [disabled]="!puedeEnviar()" (click)="enviar()">
+            @if (enviando()) {
+              <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span> Enviando…
+            } @else {
+              <i class="bi bi-megaphone-fill me-1" aria-hidden="true"></i> Enviar aviso a Bomberos
+            }
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

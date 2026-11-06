@@ -4,6 +4,7 @@ import { ENV } from '../../core/env';
 import { AuthService } from '../../core/auth/auth.service';
 import { ActividadService } from '../../core/services/actividad.service';
 import {
+  AvisoEmergencia,
   FichaAlmacenamiento,
   Notificacion,
   RegistroAuditoria,
@@ -13,12 +14,18 @@ import { ToastService } from '../../shared/toast/toast.service';
 import { formatQuantity } from '../../shared/format.util';
 import { RomboImoComponent } from '../../shared/rombo-imo/rombo-imo.component';
 
-type Pestana = 'auditoria' | 'notificaciones' | 'fichas';
+type Pestana = 'auditoria' | 'notificaciones' | 'fichas' | 'emergencias';
 
 const ETIQUETA_TIPO: Record<TipoEvento, { texto: string; clase: string }> = {
   PRODUCTO_CREADO: { texto: 'Creado', clase: 'text-bg-success' },
   PRODUCTO_ACTUALIZADO: { texto: 'Actualizado', clase: 'text-bg-primary' },
   PRODUCTO_ELIMINADO: { texto: 'Eliminado', clase: 'text-bg-danger' },
+};
+
+const ETIQUETA_EMERGENCIA: Record<AvisoEmergencia['tipo'], { texto: string; icono: string }> = {
+  INCENDIO: { texto: 'Incendio', icono: 'fire' },
+  FUGA_GAS: { texto: 'Fuga de gas', icono: 'cloud-haze2' },
+  DERRAME: { texto: 'Derrame', icono: 'droplet-half' },
 };
 
 const FORMATO_FECHA = new Intl.DateTimeFormat('es-CL', { dateStyle: 'short', timeStyle: 'medium' });
@@ -48,6 +55,7 @@ export class ActividadComponent {
   protected readonly auditoria = signal<RegistroAuditoria[]>([]);
   protected readonly notificaciones = signal<Notificacion[]>([]);
   protected readonly fichas = signal<FichaAlmacenamiento[]>([]);
+  protected readonly emergencias = signal<AvisoEmergencia[]>([]);
 
   protected readonly formatQuantity = formatQuantity;
 
@@ -79,6 +87,10 @@ export class ActividadComponent {
     return { texto: `Usuario ${corto}`, esActual: false, completo: valor };
   }
 
+  protected emergencia(tipo: AvisoEmergencia['tipo']) {
+    return ETIQUETA_EMERGENCIA[tipo] ?? { texto: tipo, icono: 'exclamation-octagon' };
+  }
+
   protected fecha(valor: string): string {
     return valor ? FORMATO_FECHA.format(new Date(valor)) : '—';
   }
@@ -90,11 +102,13 @@ export class ActividadComponent {
       auditoria: this.actividadService.auditoria(),
       notificaciones: this.actividadService.notificaciones(),
       fichas: this.actividadService.fichas(),
+      emergencias: this.actividadService.emergencias(),
     }).subscribe({
-      next: ({ auditoria, notificaciones, fichas }) => {
+      next: ({ auditoria, notificaciones, fichas, emergencias }) => {
         this.auditoria.set(auditoria);
         this.notificaciones.set(notificaciones);
         this.fichas.set(fichas);
+        this.emergencias.set(emergencias);
         this.loading.set(false);
       },
       error: (error) => {

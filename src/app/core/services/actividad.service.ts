@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ENV } from '../env';
-import { FichaAlmacenamiento, Notificacion, RegistroAuditoria } from '../models/actividad.model';
+import { AvisoEmergencia, FichaAlmacenamiento, Notificacion, RegistroAuditoria } from '../models/actividad.model';
 
 @Injectable({ providedIn: 'root' })
 export class ActividadService {
@@ -15,6 +15,10 @@ export class ActividadService {
 
   notificaciones(): Observable<Notificacion[]> {
     return this.http.get<Notificacion[]>(`${this.baseUrl}/notificaciones`);
+  }
+
+  emergencias(): Observable<AvisoEmergencia[]> {
+    return this.http.get<AvisoEmergencia[]>(`${this.baseUrl}/emergencias`);
   }
 
   fichas(): Observable<FichaAlmacenamiento[]> {

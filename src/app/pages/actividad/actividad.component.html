@@ -48,6 +48,19 @@
       <span class="badge rounded-pill text-bg-light border ms-1">{{ fichas().length }}</span>
     </button>
   </li>
+  <li class="nav-item" role="presentation">
+    <button
+      type="button"
+      class="nav-link"
+      role="tab"
+      [class.active]="pestana() === 'emergencias'"
+      [attr.aria-selected]="pestana() === 'emergencias'"
+      (click)="seleccionar('emergencias')"
+    >
+      <i class="bi bi-exclamation-octagon me-1" aria-hidden="true"></i> Emergencias
+      <span class="badge rounded-pill ms-1" [class]="emergencias().length ? 'text-bg-danger' : 'text-bg-light border'">{{ emergencias().length }}</span>
+    </button>
+  </li>
 </ul>
 
 @if (loading()) {
@@ -153,6 +166,50 @@
             <div class="text-center text-secondary py-4">
               <i class="bi bi-file-earmark fs-2 d-block mb-2" aria-hidden="true"></i>
               <p class="mb-0">Aún no se han generado fichas de almacenamiento.</p>
+            </div>
+          }
+        }
+        @case ('emergencias') {
+          @if (emergencias().length) {
+            <div class="d-grid gap-3">
+              @for (e of emergencias(); track e.id) {
+                <article class="card border emergencia-aviso">
+                  <div class="card-body">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="emergencia-aviso-icono" aria-hidden="true"><i class="bi" [class]="'bi-' + emergencia(e.tipo).icono"></i></span>
+                        <div class="lh-sm">
+                          <div class="fw-semibold">{{ emergencia(e.tipo).texto }} en {{ e.bodega }}</div>
+                          <div class="small text-secondary">{{ fecha(e.fechaReporte) }} · {{ usuario(e.usuario).texto }}</div>
+                        </div>
+                      </div>
+                      <div class="d-flex flex-wrap gap-1">
+                        <span class="badge text-bg-dark">{{ e.folio }}</span>
+                        <span class="badge text-bg-danger">Prioridad {{ e.prioridad }}</span>
+                        <span class="badge text-bg-success"><i class="bi bi-send-check me-1" aria-hidden="true"></i>{{ e.destino }}</span>
+                      </div>
+                    </div>
+                    @if (e.detalle) {
+                      <p class="small mb-2">{{ e.detalle }}</p>
+                    }
+                    @if (e.sustancias.length) {
+                      <div class="d-flex flex-wrap gap-2">
+                        @for (s of e.sustancias; track s.nombre) {
+                          <span class="emergencia-chip" [title]="s.imo">
+                            <app-rombo-imo [imo]="s.imo" [tamano]="20" />
+                            {{ s.nombre }} · {{ formatQuantity(s.cantidad) }} u.
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          } @else {
+            <div class="text-center text-secondary py-4">
+              <i class="bi bi-shield-check fs-2 d-block mb-2" aria-hidden="true"></i>
+              <p class="mb-0">No se han reportado emergencias.</p>
             </div>
           }
         }

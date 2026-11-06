@@ -19,6 +19,10 @@
 
       <div class="ms-auto d-flex align-items-center gap-1">
         @if (auth.isAuthenticated()) {
+          <button type="button" class="btn-emergencia" (click)="emergenciaAbierta.set(true)">
+            <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
+            <span class="d-none d-sm-inline">Emergencia</span>
+          </button>
           <app-notificaciones-bell />
           <div class="position-relative">
             <button
@@ -69,6 +73,10 @@
       </nav>
     }
   </header>
+
+  @if (emergenciaAbierta()) {
+    <app-emergencia-modal (cerrar)="emergenciaAbierta.set(false)" />
+  }
 
   @if (cuentaAbierta()) {
     <div class="app-click-away" (click)="cerrarMenus()"></div>

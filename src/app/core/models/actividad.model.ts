@@ -32,3 +32,26 @@ export interface FichaAlmacenamiento {
   indicaciones: string;
   fecha: string;
 }
+
+export interface SustanciaAviso {
+  nombre: string;
+  imo: string;
+  cantidad: number;
+}
+
+export interface AvisoEmergencia {
+  id: number;
+  eventoId: string;
+  folio: string;
+  tipo: TipoEmergencia;
+  prioridad: number;
+  bodega: string;
+  detalle: string | null;
+  usuario: string;
+  destino: string;
+  fechaReporte: string;
+  fechaDespacho: string;
+  sustancias: SustanciaAviso[];
+}
+
+export type TipoEmergencia = 'INCENDIO' | 'FUGA_GAS' | 'DERRAME';
