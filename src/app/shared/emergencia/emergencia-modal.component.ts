@@ -83,7 +83,13 @@ export class EmergenciaModalComponent {
         this.enviando.set(false);
       },
       error: (err) => {
-        this.error.set(err?.error?.mensaje || 'No se pudo enviar el aviso. Llame directamente al 132 (Bomberos).');
+        const status: number = err?.status ?? 0;
+        const sinAutorizacion = status === 401 || status === 403;
+        this.error.set(
+          sinAutorizacion
+            ? `Sin autorización para enviar el aviso (${status}). Llame directamente al 132 (Bomberos).`
+            : err?.error?.mensaje || `No se pudo enviar el aviso (${status}). Llame directamente al 132 (Bomberos).`
+        );
         this.enviando.set(false);
       },
     });
