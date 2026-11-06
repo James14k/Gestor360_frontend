@@ -48,8 +48,8 @@
             (ngModelChange)="filterBodega.set($event); onFiltersChanged()"
           >
             <option value="">Todas</option>
-            @for (b of bodegaOptions(); track b) {
-              <option [value]="b">{{ b }}</option>
+            @for (b of bodegas; track b.nombre) {
+              <option [value]="b.nombre">{{ b.nombre }} · {{ b.uso }}</option>
             }
           </select>
         </div>
@@ -165,7 +165,12 @@
                   <td data-label="IMO">
                     <span class="badge badge-imo">{{ p.imo }}</span>
                   </td>
-                  <td data-label="Bodega">{{ p.bodega }}</td>
+                  <td data-label="Bodega">
+                    {{ p.bodega }}
+                    @if (usoDeBodega(p.bodega); as uso) {
+                      <span class="small text-secondary">· {{ uso }}</span>
+                    }
+                  </td>
                   <td data-label="Cantidad" class="text-md-end" [class.text-warning-emphasis]="p.cantidad < 300" [class.fw-semibold]="p.cantidad < 300">
                     {{ formatQuantity(p.cantidad) }}
                   </td>
@@ -366,19 +371,25 @@
               </div>
               <div class="col-md-6">
                 <label for="field-bodega" class="form-label">Bodega <span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
+                <select
+                  class="form-select"
                   id="field-bodega"
                   name="bodega"
-                  maxlength="100"
-                  autocomplete="off"
                   [class.is-invalid]="formErrors()['bodega']"
                   [ngModel]="formModel().bodega"
                   (ngModelChange)="updateFormField('bodega', $event)"
                 >
+                  <option value="" disabled>Selecciona una bodega</option>
+                  @for (b of bodegas; track b.nombre) {
+                    <option [value]="b.nombre">{{ b.nombre }} · {{ b.uso }}</option>
+                  }
+                </select>
                 @if (formErrors()['bodega']) {
                   <div class="invalid-feedback d-block">{{ formErrors()['bodega'] }}</div>
+                } @else if (bodegaSugeridaForm(); as sugerida) {
+                  <div class="form-text">
+                    <i class="bi bi-lightbulb me-1" aria-hidden="true"></i>Según la clase IMO corresponde a <strong>{{ sugerida }}</strong>.
+                  </div>
                 }
               </div>
               <div class="col-md-6">

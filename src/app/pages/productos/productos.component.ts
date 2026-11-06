@@ -7,6 +7,7 @@ import { ToastService } from '../../shared/toast/toast.service';
 import { compareNumbers, compareStrings, extractImoClass, formatQuantity } from '../../shared/format.util';
 import { buildPageList, paginateItems, type PageEntry } from '../../shared/pagination.util';
 import { validateProducto } from '../../shared/producto-validator.util';
+import { BODEGAS, bodegaSugerida, esBodegaValida, usoDeBodega } from '../../shared/bodegas.util';
 
 type SortKey = 'id' | 'nombre' | 'imo' | 'bodega' | 'cantidad';
 type SortDir = 'asc' | 'desc';
@@ -82,9 +83,9 @@ export class ProductosComponent {
 
   protected readonly formatQuantity = formatQuantity;
 
-  protected readonly bodegaOptions = computed(() =>
-    [...new Set(this.productos().map((p) => p.bodega).filter(Boolean))].sort(compareStrings)
-  );
+  protected readonly bodegas = BODEGAS;
+  protected readonly usoDeBodega = usoDeBodega;
+  protected readonly bodegaSugeridaForm = computed(() => bodegaSugerida(this.formModel().imo));
 
   protected readonly imoClassOptions = computed(() =>
     [...new Set(this.productos().map((p) => extractImoClass(p.imo)).filter(Boolean))].sort(compareStrings)
@@ -242,7 +243,7 @@ export class ProductosComponent {
     this.formModel.set({
       nombre: producto.nombre,
       imo: producto.imo,
-      bodega: producto.bodega,
+      bodega: esBodegaValida(producto.bodega) ? producto.bodega : (bodegaSugerida(producto.imo) ?? ''),
       cantidad: String(producto.cantidad),
     });
     this.formErrors.set({});
@@ -254,7 +255,14 @@ export class ProductosComponent {
   }
 
   protected updateFormField<K extends keyof ProductoFormModel>(field: K, value: ProductoFormModel[K]): void {
-    this.formModel.update((current) => ({ ...current, [field]: value }));
+    this.formModel.update((current) => {
+      const next = { ...current, [field]: value };
+      if (field === 'imo') {
+        const sugerida = bodegaSugerida(String(value));
+        if (sugerida) next.bodega = sugerida;
+      }
+      return next;
+    });
   }
 
   protected submitForm(): void {

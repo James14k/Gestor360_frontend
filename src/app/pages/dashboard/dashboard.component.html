@@ -77,21 +77,21 @@
     <div class="col-lg-7">
       <div class="card shadow-sm h-100">
         <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0">
-          <h2 class="h5 card-title mb-0">Stock por sector</h2>
-          <p class="small text-secondary mb-0">Unidades almacenadas, de mayor a menor.</p>
+          <h2 class="h5 card-title mb-0">Stock por bodega</h2>
+          <p class="small text-secondary mb-0">Unidades almacenadas en cada bodega habilitada.</p>
         </div>
         <div class="card-body">
-          @if (stockPorSector().length) {
+          @if (stockPorBodega().length) {
             <ul class="list-unstyled mb-0 sector-chart">
-              @for (s of stockPorSector(); track s.sector) {
+              @for (s of stockPorBodega(); track s.bodega) {
                 <li
                   class="sector-row"
-                  [title]="s.sector + ': ' + formatQuantity(s.unidades) + ' unidades en ' + s.productos + (s.productos === 1 ? ' producto' : ' productos')"
+                  [title]="s.bodega + ': ' + formatQuantity(s.unidades) + ' unidades en ' + s.productos + (s.productos === 1 ? ' producto' : ' productos')"
                 >
                   <div class="d-flex justify-content-between align-items-baseline gap-2 mb-1">
                     <span class="fw-medium">
-                      {{ s.sector }}
-                      <span class="small text-secondary fw-normal">· {{ s.productos }} {{ s.productos === 1 ? 'producto' : 'productos' }}</span>
+                      {{ s.bodega }}
+                      <span class="small text-secondary fw-normal">@if (s.uso) {· {{ s.uso }} }· {{ s.productos }} {{ s.productos === 1 ? 'producto' : 'productos' }}</span>
                     </span>
                     <span class="fw-semibold small text-nowrap">{{ formatQuantity(s.unidades) }} u.</span>
                   </div>

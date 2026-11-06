@@ -7,9 +7,11 @@ import { Notificacion } from '../../core/models/actividad.model';
 import { ActividadService } from '../../core/services/actividad.service';
 import { ToastService } from '../../shared/toast/toast.service';
 import { extractImoClass, formatQuantity } from '../../shared/format.util';
+import { BODEGAS } from '../../shared/bodegas.util';
 
-interface SectorStock {
-  sector: string;
+interface BodegaStock {
+  bodega: string;
+  uso: string;
   unidades: number;
   productos: number;
   conStockBajo: number;
@@ -19,12 +21,6 @@ interface SectorStock {
 const UMBRAL_STOCK_BAJO = 300;
 const MAX_ALERTAS = 6;
 const FORMATO_FECHA = new Intl.DateTimeFormat('es-CL', { dateStyle: 'short', timeStyle: 'short' });
-
-/** "Bodega A-01" y "Bodega A-02" pertenecen al sector A. */
-function sectorDe(bodega: string): string {
-  const match = bodega.match(/bodega\s+([a-z])/i);
-  return match ? `Sector ${match[1].toUpperCase()}` : bodega;
-}
 
 @Component({
   selector: 'app-dashboard',
@@ -61,21 +57,22 @@ export class DashboardComponent {
   protected readonly alertasError = signal(false);
   protected readonly umbral = UMBRAL_STOCK_BAJO;
 
-  protected readonly stockPorSector = computed<SectorStock[]>(() => {
-    const sectores = new Map<string, Omit<SectorStock, 'widthPct'>>();
+  protected readonly stockPorBodega = computed<BodegaStock[]>(() => {
+    const bodegas = new Map<string, Omit<BodegaStock, 'widthPct'>>(
+      BODEGAS.map((b) => [b.nombre, { bodega: b.nombre, uso: b.uso, unidades: 0, productos: 0, conStockBajo: 0 }])
+    );
     for (const p of this.productos()) {
       if (!p.bodega) continue;
-      const sector = sectorDe(p.bodega);
       const cantidad = Number(p.cantidad) || 0;
-      const actual = sectores.get(sector) ?? { sector, unidades: 0, productos: 0, conStockBajo: 0 };
+      const actual = bodegas.get(p.bodega) ?? { bodega: p.bodega, uso: '', unidades: 0, productos: 0, conStockBajo: 0 };
       actual.unidades += cantidad;
       actual.productos += 1;
       if (cantidad < UMBRAL_STOCK_BAJO) actual.conStockBajo += 1;
-      sectores.set(sector, actual);
+      bodegas.set(p.bodega, actual);
     }
-    const lista = [...sectores.values()].sort((a, b) => b.unidades - a.unidades);
-    const max = Math.max(...lista.map((s) => s.unidades), 1);
-    return lista.map((s) => ({ ...s, widthPct: Math.max(2, Math.round((s.unidades / max) * 100)) }));
+    const lista = [...bodegas.values()];
+    const max = Math.max(...lista.map((b) => b.unidades), 1);
+    return lista.map((b) => ({ ...b, widthPct: b.unidades ? Math.max(2, Math.round((b.unidades / max) * 100)) : 0 }));
   });
 
   protected readonly formatQuantity = formatQuantity;

@@ -1,8 +1,8 @@
 import { ProductoSuspel } from '../core/models/producto.model';
+import { esBodegaValida } from './bodegas.util';
 
 const MAX_NOMBRE = 200;
 const MAX_IMO = 500;
-const MAX_BODEGA = 100;
 
 export interface ProductoFormValue {
   nombre: string;
@@ -39,8 +39,8 @@ export function validateProducto(payload: ProductoFormValue): ValidationResult {
 
   if (!bodega) {
     errors['bodega'] = 'La bodega es obligatoria.';
-  } else if (bodega.length > MAX_BODEGA) {
-    errors['bodega'] = `La bodega no puede superar ${MAX_BODEGA} caracteres.`;
+  } else if (!esBodegaValida(bodega)) {
+    errors['bodega'] = 'Selecciona una de las bodegas habilitadas (5, 6, 7 u 8).';
   }
 
   if (cantidadRaw === '' || cantidadRaw === null || cantidadRaw === undefined) {
