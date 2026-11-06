@@ -7,6 +7,7 @@ import { ToastService } from '../../shared/toast/toast.service';
 import { compareNumbers, compareStrings, extractImoClass, formatQuantity } from '../../shared/format.util';
 import { buildPageList, paginateItems, type PageEntry } from '../../shared/pagination.util';
 import { validateProducto } from '../../shared/producto-validator.util';
+import { RomboImoComponent } from '../../shared/rombo-imo/rombo-imo.component';
 import { BODEGAS, bodegaSugerida, esBodegaValida, usoDeBodega } from '../../shared/bodegas.util';
 
 type SortKey = 'id' | 'nombre' | 'imo' | 'bodega' | 'cantidad';
@@ -41,7 +42,7 @@ function emptyForm(): ProductoFormModel {
 @Component({
   selector: 'app-productos',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RomboImoComponent],
   templateUrl: './productos.component.html',
 })
 export class ProductosComponent {

@@ -11,6 +11,7 @@ import {
 } from '../../core/models/actividad.model';
 import { ToastService } from '../../shared/toast/toast.service';
 import { formatQuantity } from '../../shared/format.util';
+import { RomboImoComponent } from '../../shared/rombo-imo/rombo-imo.component';
 
 type Pestana = 'auditoria' | 'notificaciones' | 'fichas';
 
@@ -31,6 +32,7 @@ interface UsuarioVista {
 @Component({
   selector: 'app-actividad',
   standalone: true,
+  imports: [RomboImoComponent],
   templateUrl: './actividad.component.html',
 })
 export class ActividadComponent {

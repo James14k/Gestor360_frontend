@@ -139,7 +139,7 @@
                     <div class="card-body">
                       <div class="d-flex justify-content-between align-items-start mb-2">
                         <span class="badge text-bg-dark">{{ f.folio }}</span>
-                        <span class="badge text-bg-warning-subtle border text-warning-emphasis">Clase {{ f.claseImo }}</span>
+                        <app-rombo-imo [imo]="f.claseImo" [tamano]="36" />
                       </div>
                       <h2 class="h6 mb-1">{{ f.producto }}</h2>
                       <p class="small text-secondary mb-2">{{ f.bodega }} · {{ fecha(f.fecha) }}</p>
