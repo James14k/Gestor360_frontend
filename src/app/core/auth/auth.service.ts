@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import {
   fetchAuthSession,
   getCurrentUser,
@@ -16,6 +16,8 @@ import { Hub } from 'aws-amplify/utils';
 export class AuthService {
   readonly isAuthenticated = signal(false);
   readonly username = signal<string | null>(null);
+  readonly email = signal<string | null>(null);
+  readonly displayName = computed(() => this.email() ?? this.username());
   readonly checkingSession = signal(true);
 
   constructor() {
@@ -26,6 +28,7 @@ export class AuthService {
       if (payload.event === 'signedOut') {
         this.isAuthenticated.set(false);
         this.username.set(null);
+        this.email.set(null);
       }
     });
     this.refreshSession();
@@ -46,10 +49,13 @@ export class AuthService {
       const authenticated = !!session.tokens?.accessToken;
       this.isAuthenticated.set(authenticated);
       this.username.set(user.username ?? null);
+      const email = session.tokens?.idToken?.payload['email'];
+      this.email.set(typeof email === 'string' ? email : null);
       return authenticated;
     } catch {
       this.isAuthenticated.set(false);
       this.username.set(null);
+      this.email.set(null);
       return false;
     } finally {
       this.checkingSession.set(false);

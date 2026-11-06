@@ -107,7 +107,7 @@
               @if (token(); as t) {
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                   <span class="small text-secondary text-uppercase fw-semibold">
-                    <i class="bi bi-key me-1" aria-hidden="true"></i> Bearer token · {{ auth.username() }}
+                    <i class="bi bi-key me-1" aria-hidden="true"></i> Bearer token · {{ auth.displayName() }}
                   </span>
                   <button type="button" class="btn btn-sm btn-outline-primary" (click)="copyToken()">
                     <i class="bi me-1" [class.bi-clipboard]="!copied()" [class.bi-clipboard-check]="copied()" aria-hidden="true"></i>

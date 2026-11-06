@@ -86,7 +86,16 @@
                       <td class="text-nowrap">{{ fecha(r.fecha) }}</td>
                       <td><span class="badge" [class]="etiqueta(r.tipo).clase">{{ etiqueta(r.tipo).texto }}</span></td>
                       <td>{{ r.producto }} <span class="text-secondary small">#{{ r.productoId }}</span></td>
-                      <td>{{ r.usuario }}</td>
+                      <td>
+                        @let u = usuario(r.usuario);
+                        <span class="d-inline-flex align-items-center gap-2" [title]="u.completo">
+                          <i class="bi bi-person-circle text-secondary" aria-hidden="true"></i>
+                          {{ u.texto }}
+                          @if (u.esActual) {
+                            <span class="badge rounded-pill text-bg-light border">Tú</span>
+                          }
+                        </span>
+                      </td>
                     </tr>
                   }
                 </tbody>

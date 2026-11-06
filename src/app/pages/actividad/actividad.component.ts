@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { ENV } from '../../core/env';
+import { AuthService } from '../../core/auth/auth.service';
 import { ActividadService } from '../../core/services/actividad.service';
 import {
   FichaAlmacenamiento,
@@ -21,6 +22,12 @@ const ETIQUETA_TIPO: Record<TipoEvento, { texto: string; clase: string }> = {
 
 const FORMATO_FECHA = new Intl.DateTimeFormat('es-CL', { dateStyle: 'short', timeStyle: 'medium' });
 
+interface UsuarioVista {
+  texto: string;
+  esActual: boolean;
+  completo: string;
+}
+
 @Component({
   selector: 'app-actividad',
   standalone: true,
@@ -29,6 +36,7 @@ const FORMATO_FECHA = new Intl.DateTimeFormat('es-CL', { dateStyle: 'short', tim
 export class ActividadComponent {
   private readonly actividadService = inject(ActividadService);
   private readonly toast = inject(ToastService);
+  private readonly auth = inject(AuthService);
 
   protected readonly env = ENV;
   protected readonly loading = signal(true);
@@ -55,6 +63,18 @@ export class ActividadComponent {
 
   protected etiqueta(tipo: TipoEvento) {
     return ETIQUETA_TIPO[tipo] ?? { texto: tipo, clase: 'text-bg-secondary' };
+  }
+
+  /** El backend registra el username de Cognito (UUID); se muestra el email si es el usuario de la sesion. */
+  protected usuario(valor: string): UsuarioVista {
+    if (!valor || valor === 'sistema') {
+      return { texto: 'Sistema', esActual: false, completo: 'Proceso interno' };
+    }
+    if (valor === this.auth.username()) {
+      return { texto: this.auth.displayName() ?? valor, esActual: true, completo: valor };
+    }
+    const corto = valor.length > 12 ? `${valor.slice(0, 4)}…${valor.slice(-4)}` : valor;
+    return { texto: `Usuario ${corto}`, esActual: false, completo: valor };
   }
 
   protected fecha(valor: string): string {
