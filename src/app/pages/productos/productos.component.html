@@ -1,7 +1,6 @@
 <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
   <div>
     <h1 class="page-title mb-1">Productos Suspel</h1>
-    <p class="text-secondary mb-0">Registro, actualización y control de existencias por bodega.</p>
   </div>
   <button type="button" class="btn btn-primary" (click)="openCreateForm()">
     <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Nuevo producto
@@ -391,10 +390,6 @@
                 </select>
                 @if (formErrors()['bodega']) {
                   <div class="invalid-feedback d-block">{{ formErrors()['bodega'] }}</div>
-                } @else if (bodegaSugeridaForm(); as sugerida) {
-                  <div class="form-text">
-                    <i class="bi bi-lightbulb me-1" aria-hidden="true"></i>Según la clase IMO corresponde a <strong>{{ sugerida }}</strong>.
-                  </div>
                 }
               </div>
               <div class="col-md-6">

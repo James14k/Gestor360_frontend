@@ -13,12 +13,9 @@
         <div class="modal-body text-center py-5">
           <div class="emergencia-ok-icon mb-3"><i class="bi bi-check2-circle" aria-hidden="true"></i></div>
           <h3 class="h5 mb-2">Aviso enviado a Bomberos</h3>
-          <p class="text-secondary mb-1">
+          <p class="text-secondary mb-4">
             {{ etiquetaTipo(r.tipo) }} en <strong>{{ r.bodega }}</strong> · prioridad {{ r.prioridad }} ·
             {{ r.sustancias }} {{ r.sustancias === 1 ? 'sustancia' : 'sustancias' }} informadas
-          </p>
-          <p class="small text-secondary mb-4">
-            El aviso quedó en la cola <code>q.emergencias</code> y se despacha en orden de prioridad.
           </p>
           <div class="d-flex justify-content-center gap-2">
             <a routerLink="/actividad" class="btn btn-soft" (click)="cerrar.emit()">Ver seguimiento</a>
@@ -27,9 +24,6 @@
         </div>
       } @else {
         <div class="modal-body">
-          <p class="small text-secondary mb-3">
-            El aviso se envía a la central de Bomberos con las sustancias peligrosas almacenadas en la bodega.
-          </p>
 
           <p class="fw-semibold small mb-2">1. Bodega afectada</p>
           <div class="row g-2 mb-4">

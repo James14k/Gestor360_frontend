@@ -86,7 +86,6 @@ export class ProductosComponent {
 
   protected readonly bodegas = BODEGAS;
   protected readonly usoDeBodega = usoDeBodega;
-  protected readonly bodegaSugeridaForm = computed(() => bodegaSugerida(this.formModel().imo));
 
   protected readonly imoClassOptions = computed(() =>
     [...new Set(this.productos().map((p) => extractImoClass(p.imo)).filter(Boolean))].sort(compareStrings)

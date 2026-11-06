@@ -1,7 +1,6 @@
 <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
   <div>
     <h1 class="page-title mb-1">Panel de control</h1>
-    <p class="text-secondary mb-0">Vista general de stock, bodegas y clasificación IMO de su operación.</p>
   </div>
   <a routerLink="/productos" class="btn btn-primary">
     <i class="bi bi-boxes me-1" aria-hidden="true"></i> Gestionar productos
@@ -78,7 +77,6 @@
       <div class="card shadow-sm h-100">
         <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0">
           <h2 class="h5 card-title mb-0">Stock por bodega</h2>
-          <p class="small text-secondary mb-0">Unidades almacenadas en cada bodega habilitada.</p>
         </div>
         <div class="card-body">
           @if (stockPorBodega().length) {
@@ -126,7 +124,6 @@
                 <span class="badge rounded-pill text-bg-warning ms-1 align-middle">{{ alertas().length }}</span>
               }
             </h2>
-            <p class="small text-secondary mb-0">Recibidas por la cola <code>q.notificaciones</code> (&lt; {{ umbral }} u.).</p>
           </div>
           <button
             type="button"
@@ -171,8 +168,7 @@
           } @else {
             <div class="text-center text-secondary py-4">
               <i class="bi bi-bell-slash fs-2 d-block mb-2" aria-hidden="true"></i>
-              <p class="mb-1">Sin alertas de stock bajo.</p>
-              <p class="small mb-0">Al registrar un producto con menos de {{ umbral }} unidades, la alerta llegará por la cola.</p>
+              <p class="mb-0">Sin alertas de stock bajo.</p>
             </div>
           }
         </div>

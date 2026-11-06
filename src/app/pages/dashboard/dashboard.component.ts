@@ -55,7 +55,6 @@ export class DashboardComponent {
   protected readonly alertas = signal<Notificacion[]>([]);
   protected readonly alertasLoading = signal(true);
   protected readonly alertasError = signal(false);
-  protected readonly umbral = UMBRAL_STOCK_BAJO;
 
   protected readonly stockPorBodega = computed<BodegaStock[]>(() => {
     const bodegas = new Map<string, Omit<BodegaStock, 'widthPct'>>(
