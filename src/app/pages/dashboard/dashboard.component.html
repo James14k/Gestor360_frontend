@@ -77,44 +77,6 @@
     <div class="col-lg-7">
       <div class="card shadow-sm h-100">
         <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0">
-          <h2 class="h5 card-title mb-0">Stock bajo (&lt; 300 u.)</h2>
-        </div>
-        <div class="card-body">
-          @if (lowStock().length) {
-            <div class="table-responsive">
-              <table class="table table-sm align-middle mb-0">
-                <thead>
-                  <tr>
-                    <th scope="col">Producto</th>
-                    <th scope="col">Bodega</th>
-                    <th scope="col" class="text-end">Cantidad</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (p of lowStock(); track p.id) {
-                    <tr>
-                      <td>{{ p.nombre }}</td>
-                      <td>{{ p.bodega }}</td>
-                      <td class="text-end">
-                        <span class="badge text-bg-warning-subtle border text-warning-emphasis">{{ formatQuantity(p.cantidad) }}</span>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          } @else {
-            <div class="text-center text-secondary py-4">
-              <i class="bi bi-inbox fs-2 d-block mb-2" aria-hidden="true"></i>
-              <p class="mb-0">No hay productos con stock bajo en este momento.</p>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-5">
-      <div class="card shadow-sm h-100">
-        <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0">
           <h2 class="h5 card-title mb-0">Stock por sector</h2>
           <p class="small text-secondary mb-0">Unidades almacenadas, de mayor a menor.</p>
         </div>
@@ -149,6 +111,68 @@
             <div class="text-center text-secondary py-4">
               <i class="bi bi-inbox fs-2 d-block mb-2" aria-hidden="true"></i>
               <p class="mb-0">Sin datos de bodegas.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-transparent border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <h2 class="h5 card-title mb-0">
+              Alertas de stock
+              @if (alertas().length) {
+                <span class="badge rounded-pill text-bg-warning ms-1 align-middle">{{ alertas().length }}</span>
+              }
+            </h2>
+            <p class="small text-secondary mb-0">Recibidas por la cola <code>q.notificaciones</code> (&lt; {{ umbral }} u.).</p>
+          </div>
+          <button
+            type="button"
+            class="app-icon-btn flex-shrink-0"
+            aria-label="Actualizar alertas"
+            title="Actualizar alertas"
+            [disabled]="alertasLoading()"
+            (click)="loadAlertas()"
+          >
+            <i class="bi bi-arrow-clockwise fs-6" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="card-body">
+          @if (alertasLoading()) {
+            <div class="text-center text-secondary py-4" role="status">
+              <div class="spinner-border spinner-border-sm me-2" aria-hidden="true"></div> Consultando alertas…
+            </div>
+          } @else if (alertasError()) {
+            <div class="alert alert-warning small mb-0 d-flex align-items-start gap-2" role="alert">
+              <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+              <div>
+                No se pudieron consultar las alertas.
+                <button type="button" class="btn btn-link btn-sm p-0 align-baseline" (click)="loadAlertas()">Reintentar</button>
+              </div>
+            </div>
+          } @else if (alertas().length) {
+            <ul class="list-unstyled mb-0 alert-list">
+              @for (a of alertas(); track a.id) {
+                <li class="alert-item">
+                  <span class="alert-item-icon" aria-hidden="true"><i class="bi bi-exclamation-triangle-fill"></i></span>
+                  <div class="min-w-0 flex-grow-1">
+                    <div class="d-flex justify-content-between gap-2">
+                      <span class="fw-medium text-truncate">{{ a.producto }}</span>
+                      <span class="fw-semibold small text-nowrap">{{ formatQuantity(a.cantidad) }} u.</span>
+                    </div>
+                    <div class="small text-secondary">{{ a.bodega }} · {{ fecha(a.fecha) }}</div>
+                  </div>
+                </li>
+              }
+            </ul>
+            <a routerLink="/actividad" class="small d-inline-block mt-3">Ver toda la actividad <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+          } @else {
+            <div class="text-center text-secondary py-4">
+              <i class="bi bi-bell-slash fs-2 d-block mb-2" aria-hidden="true"></i>
+              <p class="mb-1">Sin alertas de stock bajo.</p>
+              <p class="small mb-0">Al registrar un producto con menos de {{ umbral }} unidades, la alerta llegará por la cola.</p>
             </div>
           }
         </div>

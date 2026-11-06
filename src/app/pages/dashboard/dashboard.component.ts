@@ -3,6 +3,8 @@ import { RouterLink } from '@angular/router';
 import { ENV } from '../../core/env';
 import { ProductoService } from '../../core/services/producto.service';
 import { ProductoSuspel } from '../../core/models/producto.model';
+import { Notificacion } from '../../core/models/actividad.model';
+import { ActividadService } from '../../core/services/actividad.service';
 import { ToastService } from '../../shared/toast/toast.service';
 import { extractImoClass, formatQuantity } from '../../shared/format.util';
 
@@ -15,6 +17,8 @@ interface SectorStock {
 }
 
 const UMBRAL_STOCK_BAJO = 300;
+const MAX_ALERTAS = 6;
+const FORMATO_FECHA = new Intl.DateTimeFormat('es-CL', { dateStyle: 'short', timeStyle: 'short' });
 
 /** "Bodega A-01" y "Bodega A-02" pertenecen al sector A. */
 function sectorDe(bodega: string): string {
@@ -30,6 +34,7 @@ function sectorDe(bodega: string): string {
 })
 export class DashboardComponent {
   private readonly productoService = inject(ProductoService);
+  private readonly actividadService = inject(ActividadService);
   private readonly toast = inject(ToastService);
 
   protected readonly env = ENV;
@@ -51,12 +56,10 @@ export class DashboardComponent {
     () => new Set(this.productos().map((p) => extractImoClass(p.imo)).filter(Boolean)).size
   );
 
-  protected readonly lowStock = computed(() =>
-    [...this.productos()]
-      .filter((p) => Number(p.cantidad) < UMBRAL_STOCK_BAJO)
-      .sort((a, b) => (Number(a.cantidad) || 0) - (Number(b.cantidad) || 0))
-      .slice(0, 5)
-  );
+  protected readonly alertas = signal<Notificacion[]>([]);
+  protected readonly alertasLoading = signal(true);
+  protected readonly alertasError = signal(false);
+  protected readonly umbral = UMBRAL_STOCK_BAJO;
 
   protected readonly stockPorSector = computed<SectorStock[]>(() => {
     const sectores = new Map<string, Omit<SectorStock, 'widthPct'>>();
@@ -79,10 +82,31 @@ export class DashboardComponent {
 
   constructor() {
     this.loadDashboard();
+    this.loadAlertas();
   }
 
   protected reload(): void {
     this.loadDashboard();
+    this.loadAlertas();
+  }
+
+  protected loadAlertas(): void {
+    this.alertasLoading.set(true);
+    this.alertasError.set(false);
+    this.actividadService.notificaciones().subscribe({
+      next: (alertas) => {
+        this.alertas.set(alertas.slice(0, MAX_ALERTAS));
+        this.alertasLoading.set(false);
+      },
+      error: () => {
+        this.alertasError.set(true);
+        this.alertasLoading.set(false);
+      },
+    });
+  }
+
+  protected fecha(valor: string): string {
+    return valor ? FORMATO_FECHA.format(new Date(valor)) : '';
   }
 
   private loadDashboard(): void {
